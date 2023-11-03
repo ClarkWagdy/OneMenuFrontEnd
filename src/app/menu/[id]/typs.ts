@@ -25,7 +25,7 @@ Language:boolean,
 }
 
 
-export interface PageProps{
+export interface Props{
   params?: { id: string }
   searchparams?: any
 }

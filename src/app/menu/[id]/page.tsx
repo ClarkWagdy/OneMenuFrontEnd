@@ -28,11 +28,11 @@ import Swal from 'sweetalert2';
  
 import {  toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
-import { PageProps } from './typs';
+import { Props } from './typs';
  
 
 
-export default function Page(props:PageProps){ 
+export default function Page(props:Props){ 
   const _Lan = useAppSelector((state) => state.Lan) 
   const [CreateOrEditcategoryModal, setCreateOrEditcategoryModal] = useState<boolean>(false);
   const [CreateOrEditItemModal, setCreateOrEditItemModal] = useState<boolean>(false);
