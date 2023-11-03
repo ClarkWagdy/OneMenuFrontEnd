@@ -25,7 +25,4 @@ Language:boolean,
 }
 
 
-export interface Props{
-  params?: { id: string }
-  searchparams?: any
-}
+ 

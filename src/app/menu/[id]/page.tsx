@@ -21,18 +21,18 @@ import NoItems from '@/Component/NoItems/NoItems';
 import { SetLoad } from '@/config/Store/Load/LoadSlice';
 import { CategoryDTO, ProductDTO, RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import axios from 'axios';
- 
+import { useParams } from 'next/navigation'
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { OffersImagePath, url, VideoPath } from '@/config/Api/url'; 
 import Swal from 'sweetalert2';
  
 import {  toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
-import { Props } from './typs';
  
 
 
-export default function Page(props:Props){ 
+export default function Page(){ 
+  const params = useParams()
   const _Lan = useAppSelector((state) => state.Lan) 
   const [CreateOrEditcategoryModal, setCreateOrEditcategoryModal] = useState<boolean>(false);
   const [CreateOrEditItemModal, setCreateOrEditItemModal] = useState<boolean>(false);
@@ -43,9 +43,9 @@ export default function Page(props:Props){
 
 
   useEffect(()=>{  
-      if(Object.keys(Restaurant).length===0 && props.params?.id){
+      if(Object.keys(Restaurant).length===0 && params?.id){
         dispatch(SetLoad(true));
-        axios.get(`${url}/restaurant/by-id/${props.params?.id}`)
+        axios.get(`${url}/restaurant/by-id/${params?.id}`)
     .then(  function (response) {
      
       if(response.status===200){ 
