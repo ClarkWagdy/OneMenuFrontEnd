@@ -1,0 +1,12 @@
+.noItemsContain{
+   
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #75A4FE;
+    font-weight: bold;
+    padding: 20PX;
+    font-size: 20PX;
+}

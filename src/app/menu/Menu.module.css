@@ -1,0 +1,766 @@
+.body{
+background-color: white;
+height: 100dvh;
+width: 100vw;
+color:black ;
+display: flex;
+flex-direction: column;
+}
+.Mediasection{
+    display: flex;
+    height: 40dvh;
+}
+.Mediasection>div>video{
+    height: 40dvh;
+   width: 100vw;
+   object-fit: cover;
+}
+.MediaVideosection video{
+position: absolute;
+ 
+top: 0;
+right: 0;
+left: 0;
+z-index: 1;
+}
+.MediaVideosection ,.restaurantDetails{
+    position: relative;
+    display: flex;
+justify-content: center;
+align-items: center;
+width: 100% !important;
+height: 100% !important;
+
+z-index: 2;
+ 
+}
+.restaurantDetails{
+    padding: 10px;
+}
+.LogoImg{
+position: relative  !important;
+max-width: 40%;
+ height: 50% !important;
+ object-fit: contain;
+}
+ 
+
+.SwiperImage{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.LanguagePart{
+    position: absolute;
+    z-index: 3;
+    padding: 10px;
+    width: 100%;
+    text-align: flex-end;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.LanBtn{
+    cursor: pointer;
+    border-radius: 25px;
+    padding: 5px;
+    padding-inline:10px;
+    outline: unset;
+    border: transparent;
+    color: white;
+    font-weight: bold;
+    background-color: transparent !important;
+    transition: all 250ms;
+}
+.LanBtn:hover{
+    transform: scale(1.05);
+ 
+}
+.MenuCard{
+    position: relative;
+    background-color: #F8F6F4;
+    z-index: 3;
+      height: calc(100dvh - 40dvh + 25px) !important;
+    height: 100dvh;
+ padding:10px 25px;
+ 
+
+    margin-top: -25px;
+    border-radius: 25px  25px 0 0;
+    -webkit-box-shadow: 0px -5px 33px 5px rgba(0,0,0,0.36);
+    -moz-box-shadow: 0px -5px 33px 5px rgba(0,0,0,0.36);
+    box-shadow: 0px -5px 33px 5px rgba(0,0,0,0.36);
+}
+.MenuCard>div{
+    position: relative;
+}
+.MenuList{
+    width: auto;
+}
+.MenuList div{
+    border-bottom: 2px solid transparent  ;
+    cursor: pointer;
+    opacity: 0.5;
+    font-weight: bold;
+    transition: all 250ms;
+}
+.MenuList div:hover,
+.MenuList.active div {
+    opacity: 1; 
+   border-bottom-style:solid  ;
+}
+/* .SwiperMenuList{
+    display: flex;
+    justify-content: center;
+    
+} */
+/* .MenuCard .swiper-wrapper{
+    justify-content: center !important;
+} */
+
+
+.AllProductContainer{
+    height: calc(100dvh - 40dvh - 32px);
+    display:flex; 
+    border-top: 1px solid rgba(0,0,0,0.1);
+     justify-content: center;
+     align-items: center; 
+    overflow-y: scroll;
+      /* padding-top: 80px; */
+
+}
+.AllProductCard{
+   position: relative;
+   display:flex; 
+   gap: 30px;
+     flex-wrap: wrap; 
+    justify-content: center;
+    align-items: center; 
+    
+   
+    padding: 20px 0;
+
+}
+.ProductCard{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width:150px ;
+    align-items: flex-end;
+}
+.ProductImage{
+    max-width:150px !important;
+    width: 150px;
+    height: 150px;
+    position: relative !important;
+    max-height: 150px ;
+    object-fit: cover;
+border-radius:25px !important ;
+background-color: rgba(0, 0, 0, 0.1);
+}
+.AddProductCard{
+    max-width:100px !important;
+    width:100px !important; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius:25px !important ;
+    height:100px;
+    max-height:100px;
+
+    border: 1px dashed  ;
+    cursor: pointer;
+    transition: all 350ms;
+}
+.AddProductCard:hover{
+transform: scale(1.05);
+}
+ 
+.ProductCard p{
+    line-height: 15px;
+    font-size: 13px;
+    opacity: 0.5;
+}
+.ProductCard .price{
+ font-weight: bold;
+}
+
+
+
+@media (max-width:550px) {
+    .LogoImg{
+        
+        
+         height: 25% !important;
+        
+        }
+        .Mediasection{
+ 
+            height: 30dvh;
+        }
+        .MenuCard{
+            height: calc(100dvh - 30dvh + 25px) !important;
+        }
+        .Mediasection>div>video{
+            height: 30dvh;
+  
+        }
+        .AllProductContainer,.AllProductCard{
+     
+            height: calc(100dvh - 30dvh - 32px);
+          
+        
+        }
+}
+
+
+@media (max-width:400px) {
+    
+        .Mediasection{
+ 
+            height: 20dvh;
+        }
+        .MenuCard{
+            height: calc(100dvh - 20dvh + 25px) !important;
+        }
+        .Mediasection>div>video{
+            height: 20dvh;
+  
+        }
+        .AllProductContainer,.AllProductCard{
+     
+            height: calc(100dvh - 20dvh - 32px);
+          
+        
+        } 
+        .MenuCard{
+            padding: 10px 5px !important;
+        }
+        .MenuLisrCard{
+            padding: 0 20px;
+        }
+        .AllProductCard{
+            padding-right:  0 !important;
+            padding-left:  0 !important;
+            gap: 10px;
+        }
+        .LogoImg{
+        
+        
+            height: 40% !important;
+           
+           }
+}
+@media (max-width:325px) {
+    
+.ProductImage,.ProductCard{
+    width: 130px;
+}
+.PadInEnd40px{
+    padding-inline-end:80px !important;
+     
+}
+.ProductCard .AddIconCard{
+    padding: 5px;
+}
+ 
+}
+
+
+
+.AddCategory{
+ 
+    width: 101%;
+    display: flex;
+    justify-content:  flex-end ;
+}
+.dcenter{
+    justify-content:  center ;
+}
+.AddIcon{
+   z-index: 4;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0,0.9);
+  padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: -5px;
+   border-color:transparent ;
+    cursor: pointer;
+    transition:all 350ms ;
+}
+.AddIcon svg path{
+   
+ fill: white;
+}
+.AddIcon:hover{
+    transform: scale(1.1);
+}
+.ModalClass{
+    border-radius: 25px;
+    padding: 5px;
+    overflow: hidden;
+}
+.PadInEnd40px{
+    padding-inline-end:50px !important;
+
+}
+  .SwiperMenuList{
+    display: flex;
+   align-items: center;
+    min-height: 36px !important;
+}  
+.CategoList{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+}
+.Item{
+    width: 100%;
+    border-radius:10px ;
+    border: 1px solid rgba(0,0,0,0.2) ;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: capitalize;
+}
+.actions{
+    display: flex;
+    gap: 5px;
+}
+.AddCancelActions{
+    flex-direction: column;
+}
+.btn{
+border-radius: 10px;
+outline: unset;
+
+padding: 5px;
+width: 30px;
+height: 30px;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: transparent;
+transition: all 250ms;
+}
+.btn svg path{
+    transition: all 250ms;
+     }
+.btn:hover svg path{
+    fill: white;
+     }
+
+.Editbtn{
+    border: 1px solid #0183FF;
+}
+.Deletebtn{
+    border: 1px solid tomato;
+}
+.Editbtn svg path{
+    fill:  #0183FF;
+}
+.Deletebtn svg path{
+    fill:   tomato;
+}
+
+.Deletebtn:hover  {
+  
+    background-color: tomato;
+     }
+
+     .Editbtn:hover{
+        background-color:  #0183FF;
+    }
+    .AddBtn{
+        outline: unset;
+
+padding: 5px;
+        border-radius: 25px;
+        width: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        color: white;
+        font-weight: bold;
+        border: 1px solid #2A4CF6;
+        background: #2A4CF6;
+        transition: all 250ms;
+    }
+   
+    .AddBtn svg path{
+        fill: white;
+        transition: all 250ms;
+    }
+
+    .AddBtn:hover{
+        background: transparent;
+        color: #2A4CF6;
+    }
+    .AddBtn:hover svg path {
+        fill: #2A4CF6; 
+    }
+ .Save_Btn{
+    border-color: #03C988;
+    background: #03C988;
+ }
+ .Save_Btn:hover{
+    background: transparent;
+    color: #03C988;
+}
+.Save_Btn:hover svg path {
+    fill: #03C988; 
+}
+    .AddInput{
+        background-color: transparent;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        border-radius: 5px;
+        padding: 5px;
+        outline: unset !important;
+        color: black;
+        width: 100%;
+        padding-inline-end:20px ;
+    }
+    .SaveBtn{
+        border: 1px solid #03C988;
+        height: 50px !important;
+    }
+    .BtnSave{
+        border: 1px solid #03C988;
+    }
+  
+    .SaveBtn svg path,
+    .BtnSave svg path{
+        fill:  #03C988;
+    }
+
+    .SaveBtn:hover,
+    .BtnSave:hover{
+        background: #03C988;
+     
+    }
+    .SaveBtn:hover svg path,
+    .BtnSave:hover svg path {
+        fill: white; 
+    }
+
+    .CancelBtn{
+        border: 1px solid tomato;
+        height: 50px !important;
+    }
+
+  
+    .CancelBtn svg path{
+        fill:  tomato;
+    }
+
+    .CancelBtn:hover{
+        background: tomato;
+     
+    }
+    .CancelBtn:hover svg path {
+        fill: white; 
+    }
+
+
+
+
+
+    .SaveBtn:disabled,.AddBtn:disabled,.BtnSave:disabled{
+     opacity: 0.3;  
+     pointer-events: none; 
+    }
+   
+    .NewItem{
+        position: relative;
+        display: flex;
+        gap: 3px;
+    }
+
+    .ModalLoading{
+        z-index: 5;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .Inputs,.AddItemForm{
+        width: 100% !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+    }
+    .TranslatBtn{
+        border:1px solid #518EF8;
+    }
+    .TranslatBtn:disabled{
+        opacity: 0.3;  
+        pointer-events: none; 
+    }
+    .TranslatBtn svg path {
+        fill: #518EF8;
+    }
+
+    .TranslatBtn:hover{
+        background-color: #518EF8;
+    }
+   .dCenter{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+   }
+   .CloseContain{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+   }
+   .CloseContain h4{
+    -webkit-user-select: none;  
+    -ms-user-select: none;  
+    user-select: none; 
+   }
+   .btnClose{
+    right: 0;
+    border: unset;
+   }
+
+   .btnClose svg path{
+fill: tomato;
+opacity: 0.7;
+transition: all 250me;
+   }
+   .btnClose:hover{
+    transform: scale(1.08) !important;
+   }
+   .btnClose:hover svg path{
+    opacity: 1;
+    fill: tomato;
+  
+       }
+
+
+
+       .DragIcon{
+        -webkit-user-select: none;  
+        -ms-user-select: none;  
+        user-select: none;  
+        display: flex;
+        align-items: center;
+       }
+       
+       .DragIcon svg{
+        cursor: pointer;
+       opacity: 0.5;
+       }
+
+
+.btnsEditCard{
+    position: absolute;
+    top: -10px;
+ 
+}
+       .AddIconCard{
+        z-index: 4;
+         border-radius: 50%;
+         background-color: rgba(0, 0, 0,0.8) ;
+       padding: 5px;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+
+        border-color:transparent ;
+         cursor: pointer;
+         transition:all 350ms ;
+     }
+     .AddIconCard svg path{
+        
+      fill: white;
+     }
+     .AddIconCard:hover{
+         transform: scale(1.1);
+     }
+     .textStart{
+        width: 100%;
+        
+        display: flex;
+        align-items: center;
+        white-space: normal;
+        text-align: start;
+     }
+ .AddItemForm{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+ }
+     .AddItemImageForm{
+        position: relative;
+        display: flex;
+        justify-content: flex-end;
+        
+     }
+     .AddItemImageForm label{
+        position: absolute;
+ 
+        border-radius: 50%;
+       width: 30px;
+       height: 30px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+margin-inline-end: 10px;
+        bottom: 5px;
+        -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+transition: all 250ms;
+
+     }
+     .AddItemImageForm label svg path{
+        fill: white;
+     }
+     .AddItemImageForm label:hover{
+ transform: scale(1.1);
+
+     }  
+
+
+     .AddItemImageForm input{
+        display: none;
+     }
+     .AddItemImageForm img{
+        width: 250px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 15px;
+        background-color: rgba(0, 0, 0, 0.1);
+     }
+
+     .Inputsflexcenter{
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 5px;
+  
+     }
+.Inputsflexcenter input{
+    margin-bottom: 5px;
+}
+     .paddinginend{
+        padding-inline-end: 0;
+     }
+     .ErrorMessage{
+        position: absolute;
+        color: tomato;
+        font-size: 11px;
+        bottom: -10px;
+     }
+     .btnSettings{
+        border: transparent;
+        transition: all 250ms;
+
+     }
+     .btnSettings:hover{
+        transform: rotate(25deg);
+     }
+     .btnSettings svg path{
+        fill: white;
+     }
+
+.Languagesselect{
+    border-radius: 25px !important;
+    outline: unset !important;
+    padding: 0 5px;
+    height: 30px;
+    font-size: 14px;
+    line-height: 1px;
+    color: black;
+    background-color: transparent;
+}
+.offerCard{
+    background-color: #A1C2F1;
+    border-radius: 25px;
+    width: 90px;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 250ms;
+}
+.offerCard:hover{
+    transform: scale(1.05);
+}
+.offerCard svg path{
+    fill: white;
+ 
+}
+.OfferInput{
+    display: none;
+}
+.OffersImag{
+    gap: 8px;
+
+
+}
+
+.OffersImag img{
+    -webkit-box-shadow: 0px 0px 13px -5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 13px -5px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 13px -5px rgba(0,0,0,0.75);
+    border-radius:15px;
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+}
+.offerImg{
+    position: relative;
+    display: flex;
+justify-content: flex-end;
+}
+.ImageDelete{
+    position: absolute;
+    top: -5px;
+    background-color: rgba(255,255,255,0.85);
+    padding: 5px;
+    border-radius: 50%;
+    -webkit-box-shadow: 0px 0px 13px -6px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 13px -6px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 13px -6px rgba(0,0,0,0.75);
+cursor: pointer;
+transition: all 250ms;
+
+}
+.ImageDelete:hover{
+transform: scale(1.05);
+}
+.offerImg video{
+    height: 150px !important;
+    width: 200px !important;
+    width: auto;
+    border-radius: 15px;
+    object-fit: cover;
+}

@@ -1,0 +1,16 @@
+.Copyright{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 0.8em;
+    justify-content: center;
+    direction: ltr !important;
+}
+
+.Copyright a{
+margin-inline-start:5px ;
+display: flex;
+align-items: center;
+ 
+justify-content: center;
+}

@@ -1,0 +1,145 @@
+'use client'
+import React, { FC, useState } from 'react' 
+import classes from "./login.module.css";
+import Image from 'next/image'
+import Copyright from "@/Component/Copyright/Copyright";
+import {
+    Formik, 
+    Form,
+    Field,
+    ErrorMessage,
+    FieldProps,
+  } from 'formik';
+  import * as Yup from 'yup';
+import { strings } from '@/config/localization/LocalizedStrings';
+import { Languages, LanguagesTitle } from '@/config/localization/Languages';
+import { useAppDispatch, useAppSelector } from '@/config/Store/hooks';
+import { SetLan } from '@/config/Store/Lan/LanSlice';
+import { SetLoad } from '@/config/Store/Load/LoadSlice';
+import axios from 'axios';
+import { url } from '@/config/Api/url';
+import { SetUser } from '@/config/Store/User/UserSlice';
+import { UserT } from '@/config/Store/User/UserType';
+import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
+import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
+import { redirect, useRouter } from 'next/navigation'
+
+export default function Login(){
+    const [Load, setLoad] = useState<boolean>(false); 
+
+    const _Lan = useAppSelector((state) => state.Lan)
+    const dispatch = useAppDispatch();
+    const router = useRouter();
+    function HandleLanChange() {
+        if (_Lan === Languages.AR) {
+          dispatch(SetLan(Languages.EN))
+    
+    
+        } else {
+          dispatch(SetLan(Languages.AR))
+    
+        }
+      }
+ 
+      let user=localStorage.getItem('User'); 
+      if(user !== null && user !== undefined){ 
+        let userdata=JSON.parse(user) as UserT; 
+        redirect(`menu/${userdata.RestaurantId}`); 
+      }
+     
+
+  
+  
+return(<>
+ <div className={classes.LanguagePart}>
+          <button className={classes.LanBtn} onClick={() => HandleLanChange()}>
+            {_Lan === Languages.AR ? LanguagesTitle.EN : LanguagesTitle.AR}
+          </button>
+          </div>
+<div className={classes.main}>
+
+<section className={classes.Logodiv}>
+ <div>
+    <Image className={classes.Logo} src="/wlogo.svg" width={500} height={500} alt="All in One Chip"  />
+
+ </div>
+ 
+</section>
+
+<section  className={classes.LoginForm}>
+
+<div>
+<h2>{strings.Welcomeback}</h2>
+    <p>{strings.Menumanagementsystem} </p>
+</div>
+<Formik
+          enableReinitialize={true}
+          initialValues={{
+             UserName:'',
+              Password: '',
+          }}
+          validationSchema={
+            Yup.object().shape({
+              UserName:Yup.string().required(strings.Required),
+              Password: Yup.string().min(3, strings.TooShort).max(30, strings.TooLong).required(strings.Required),
+          
+            })
+          }
+          onSubmit={async (values, actions) => {
+
+            setLoad(true)
+            axios.post(`${url}/user/login`,{...values} )
+            .then(function (response) {
+              if(response.status===200){
+                var user:UserT={...response.data.data.user};
+                var restaurant:RestaurantT={...response.data.data.restaurant};
+                user.RestaurantId=restaurant.id;
+                dispatch(SetUser(user));
+                dispatch(SetRestaurant(restaurant));              
+                router.replace(`/menu/${restaurant.id}`);
+              }
+              
+            
+            })
+            .catch(function (error) {
+              // handle error
+              setLoad(false)
+              console.log(error);
+            }) 
+            
+         
+          }}
+        >
+
+          {({ errors, touched, values, setFieldValue }) => (
+            <Form className={classes.LoginFormik}>
+            <Field disabled={Load}  className={classes.LoginField} autoComplete="off" name={"UserName"} placeholder={strings.CodeorEmail}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="UserName" />
+
+            <Field  disabled={Load}  className={classes.LoginField} autoComplete="off" name={"Password"} type='password' placeholder={strings.Password}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="Password" />
+
+           <button disabled={Load} type='submit' >
+            {Load?(<>
+              <div className="spinner-border spinner-border-sm" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            </>):(<>{strings.Login}</>)}
+            
+            </button>
+                     </Form>
+          )}
+
+        </Formik>
+
+
+
+ 
+
+ <Copyright/>
+</section>
+
+ </div>
+ 
+</>)
+}

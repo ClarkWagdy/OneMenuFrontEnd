@@ -1,0 +1,171 @@
+.main{
+    width: 100vw;
+    min-height: 100vh;
+    height: 100vh;
+    position: relative;
+padding: 0 5%;
+    background-color: #3f3f3f;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.Logo{
+    width: 50vw!important;
+    height: auto !important;
+   
+}
+.Logodiv{
+     width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.Logodiv>div{
+    height: 100% !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.LoginForm{
+    /* width: 40%; */
+    background-color: white; 
+    /* min-height:40%; */
+    height:auto;
+    padding: 40px 10px 5px 10px;
+    border-radius: 25px 25px 0 0;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+}
+/* .SeLoginForm{
+    display: flex;
+    justify-content: center;
+} */
+.LoginFormik{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 10px 0;
+    gap: 10px;
+    width:80% !important;
+    
+}
+ 
+ @media (min-width:768px) {
+    .LoginFormik{
+      
+        width:60% !important;
+    }
+    .main{
+    
+        padding: 0 20%;
+         
+        }
+        .Logo{
+            width: 30vw!important; 
+           
+        }
+ }
+ @media (min-width:992px) {
+    .LoginFormik{
+      
+        width:50% !important;
+    }
+ } 
+ @media (min-width:1200px) {
+    .LoginFormik{
+      
+        width:40% !important;
+    }
+   
+ }
+.LoginFormik input{
+    font-size: 1em;
+    border-radius: 25px;
+    outline: unset;
+    box-shadow: unset;
+    border: unset;
+min-height: 45px;
+width: 100%;
+text-align: center;
+}
+.LoginFormik input:focus{
+outline:2px solid rgba(0,0,0,0.4) ;
+-webkit-box-shadow: 0px 0px 19px -5px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 19px -5px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 19px -5px rgba(0,0,0,0.75);
+}
+.LoginFormik input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: white;
+    opacity: 1; /* Firefox */
+  }
+  
+  .LoginFormik input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: white;
+  }
+  
+  .LoginFormik input::-ms-input-placeholder { /* Microsoft Edge */
+    color: white;
+  }
+
+  .LoginFormik button{
+    font-size: 1em;
+    border-radius: 25px;
+    outline: unset;
+    box-shadow: unset;
+    border: unset;
+min-height: 45px;
+ padding: 0 40px;
+ background-color: #4aa96c;
+ border:2px solid #4aa96c;
+ transition: all 250ms;
+
+}
+.LoginFormik button:hover{
+ color: #4aa96c;
+ background-color: transparent;
+}
+
+.ErrorMessage{
+   line-height: 1px;
+    color: tomato;
+    font-size: 11px;
+ 
+ }
+
+ .LanguagePart{
+    position: absolute;
+    z-index: 3;
+    padding: 10px;
+    width: 100vw;
+    text-align: flex-end;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.LanBtn{
+    cursor: pointer;
+    border-radius: 25px;
+    padding: 5px;
+    padding-inline:10px;
+    outline: unset;
+    border: transparent;
+    color: white;
+    font-weight: bold;
+    background-color: transparent !important;
+    transition: all 250ms;
+}
+.LanBtn:hover{
+    transform: scale(1.05);
+ 
+}
+.LoginField{
+    background-color: rgba(0,0,0,0.4) !important;
+}
