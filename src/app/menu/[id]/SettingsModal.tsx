@@ -1,3 +1,4 @@
+'use client'
 import { Languages } from '@/config/localization/Languages';
 import { strings } from '@/config/localization/LocalizedStrings';
 import { useAppSelector } from '@/config/Store/hooks';
