@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "^13.1.6",
     "@nextui-org/react": "^2.2.1",
     "@nextui-org/switch": "^2.0.22",
     "@reduxjs/toolkit": "^1.9.5",
