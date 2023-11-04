@@ -6,7 +6,9 @@
     justify-content: center;
     direction: ltr !important;
 }
-
+.Copyright p{
+    margin: 0;
+}
 .Copyright a{
 margin-inline-start:5px ;
 display: flex;

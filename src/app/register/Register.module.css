@@ -28,7 +28,7 @@ padding: 0 5%;
     justify-content: center;
     align-items: center;
 }
-.LoginForm{
+.RegisterForm{
     /* width: 40%; */
     background-color: white; 
     /* min-height:40%; */
@@ -42,11 +42,11 @@ padding: 0 5%;
     justify-content: space-between;
     text-align: center;
 }
-/* .SeLoginForm{
+/* .SeRegisterForm{
     display: flex;
     justify-content: center;
 } */
-.LoginFormik{
+.RegisterFormik{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -58,7 +58,7 @@ padding: 0 5%;
 }
  
  @media (min-width:768px) {
-    .LoginFormik{
+    .RegisterFormik{
       
         width:60% !important;
     }
@@ -73,19 +73,19 @@ padding: 0 5%;
         }
  }
  @media (min-width:992px) {
-    .LoginFormik{
+    .RegisterFormik{
       
         width:50% !important;
     }
  } 
  @media (min-width:1200px) {
-    .LoginFormik{
+    .RegisterFormik{
       
         width:40% !important;
     }
    
  }
-.LoginFormik input{
+.RegisterFormik input{
     font-size: 1em;
     border-radius: 25px;
     outline: unset;
@@ -95,26 +95,26 @@ min-height: 45px;
 width: 100%;
 text-align: center;
 }
-.LoginFormik input:focus{
+.RegisterFormik input:focus{
 outline:2px solid rgba(0,0,0,0.4) ;
 -webkit-box-shadow: 0px 0px 19px -5px rgba(0,0,0,0.75);
 -moz-box-shadow: 0px 0px 19px -5px rgba(0,0,0,0.75);
 box-shadow: 0px 0px 19px -5px rgba(0,0,0,0.75);
 }
-.LoginFormik input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+.RegisterFormik input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: white;
     opacity: 1; /* Firefox */
   }
   
-  .LoginFormik input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  .RegisterFormik input:-ms-input-placeholder { /* Internet Explorer 10-11 */
     color: white;
   }
   
-  .LoginFormik input::-ms-input-placeholder { /* Microsoft Edge */
+  .RegisterFormik input::-ms-input-placeholder { /* Microsoft Edge */
     color: white;
   }
 
-  .LoginFormik button{
+  .RegisterFormik button{
     font-size: 1em;
     border-radius: 25px;
     outline: unset;
@@ -127,7 +127,7 @@ min-height: 45px;
  transition: all 250ms;
 
 }
-.LoginFormik button:hover{
+.RegisterFormik button:hover{
  color: #4aa96c;
  background-color: transparent;
 }
@@ -167,6 +167,6 @@ min-height: 45px;
     transform: scale(1.05);
  
 }
-.LoginField{
+.RegisterField{
     background-color: rgba(0,0,0,0.4) !important;
 }

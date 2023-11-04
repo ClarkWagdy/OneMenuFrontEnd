@@ -41,5 +41,18 @@ export const ar={
         cancel:"الغاء",
         deleted:"تم الحذف",
         AreyousuredeletingtheItem:"هل أنت متأكد من حذف العنصر؟",
+        register:"انشاء حساب جديد",
+        or:"او",
+        now:"الأن",
+        Donthaveaccount:"ليس لديك حساب؟",
+        createanaccount:"إنشاء حساب",
+        signin:"تسجيل الدخول",
+        haveaccount:"لديك حساب؟",
+        Name:"أدخل أسمك",
+        Email:"أدخل بريدك الإلكتروني",
+        phoneNumber:"أدخل رقم هاتفك",
+        userName:"اختر اسم المستخدم",
+        cPassword:"تأكيد كلمة المرور",
+        Passwordsmustmatch:"يجب أن تتطابق كلمات المرور",
 
 }

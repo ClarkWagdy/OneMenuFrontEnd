@@ -9,10 +9,11 @@ export default function Home() {
 
 <>
 <HeadPage/>
-<main className={styles.main  }>
-      <div className={styles.description}>
-       <h2>Clark</h2>
-      </div>
+<main className={styles.Home  }>
+ 
+<Image   src="/wlogo.svg" width={500} height={500} alt="All in One Chip"  />
+
+   
     </main>
 
 </>

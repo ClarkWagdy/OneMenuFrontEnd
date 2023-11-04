@@ -9,7 +9,7 @@ import Loading from '@/Component/Loading/Loading'
 import { SetLoad } from '@/config/Store/Load/LoadSlice'
 import { SetUser } from '@/config/Store/User/UserSlice' 
 import { UserT } from '@/config/Store/User/UserType' 
-  
+import 'animate.css';
 const cairo = Cairo({ subsets: ['arabic','latin','latin-ext'] });
 
 

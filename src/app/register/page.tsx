@@ -1,6 +1,6 @@
 'use client'
 import React, { FC, useState } from 'react' 
-import classes from "./login.module.css";
+import classes from "./Register.module.css";
 import Image from 'next/image'
 import Copyright from "@/Component/Copyright/Copyright";
 import {
@@ -26,7 +26,7 @@ import { redirect, useRouter } from 'next/navigation'
 import Link from 'next/link';
 import Head from './head';
 
-export default function Login(){
+export default function Register(){
     const [Load, setLoad] = useState<boolean>(false); 
 
     const _Lan = useAppSelector((state) => state.Lan)
@@ -53,7 +53,8 @@ export default function Login(){
   
   
 return(<>
-  <Head />
+
+<Head />
  <div className={classes.LanguagePart}>
           <button className={classes.LanBtn} onClick={() => HandleLanChange()}>
             {_Lan === Languages.AR ? LanguagesTitle.EN : LanguagesTitle.AR}
@@ -69,37 +70,50 @@ return(<>
  
 </section>
 
-<section  className={"animate__animated  animate__fadeInUp " +classes.LoginForm}>
+<section  className={"animate__animated  animate__fadeInUp " +classes.RegisterForm}>
 
 <div>
 <h2>{strings.Welcomeback}</h2>
     <p>{strings.Menumanagementsystem} </p>
 </div>
+
+
+
+{/* "name": "string",
+  "phoneNumber": "string",
+  "email": "string",
+  "userName": "string",
+  "password": "string",
+  "type": 0 */}
+
+
 <Formik
           enableReinitialize={true}
           initialValues={{
-             UserName:'',
-              Password: '',
+            name: '',
+            phoneNumber: '',
+            email: '',
+            userName: '',
+            password: '',
+              type:0
           }}
           validationSchema={
             Yup.object().shape({
-              UserName:Yup.string().required(strings.Required),
-              Password: Yup.string().min(3, strings.TooShort).max(30, strings.TooLong).required(strings.Required),
-          
+              name:Yup.string().required(strings.Name),
+              phoneNumber:Yup.string().required(strings.phoneNumber),
+              userName:Yup.string().required(strings.userName),
+              email:Yup.string().email().required(strings.Email),
+              password: Yup.string().min(3, strings.TooShort).max(30, strings.TooLong).required(strings.Password),
+              cpassword: Yup.string().oneOf([Yup.ref('password'), ''], strings.Passwordsmustmatch).required(strings.cPassword)
             })
           }
           onSubmit={async (values, actions) => {
 
             setLoad(true)
-            axios.post(`${url}/user/login`,{...values} )
+            axios.post(`${url}/user/register`,{...values} )
             .then(function (response) {
               if(response.status===200){
-                var user:UserT={...response.data.data.user};
-                var restaurant:RestaurantT={...response.data.data.restaurant};
-                user.RestaurantId=restaurant.id;
-                dispatch(SetUser(user));
-                dispatch(SetRestaurant(restaurant));              
-                router.replace(`/menu/${restaurant.id}`);
+                  console.log(response)
               }
               
             
@@ -115,37 +129,41 @@ return(<>
         >
 
           {({ errors, touched, values, setFieldValue }) => (
-            <Form className={classes.LoginFormik}>
-            <Field disabled={Load}  className={classes.LoginField} autoComplete="off" name={"UserName"} placeholder={strings.CodeorEmail}/>
-            <ErrorMessage className={classes.ErrorMessage} component="span" name="UserName" />
+            <Form className={classes.RegisterFormik}>
+            <Field disabled={Load}  className={classes.RegisterField} autoComplete="off" name={"name"} placeholder={strings.Name}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="name" />
+           
+            <Field disabled={Load}  className={classes.RegisterField} autoComplete="off" name={"email"} placeholder={strings.Email}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="email" />
 
-            <Field  disabled={Load}  className={classes.LoginField} autoComplete="off" name={"Password"} type='password' placeholder={strings.Password}/>
-            <ErrorMessage className={classes.ErrorMessage} component="span" name="Password" />
+            <Field disabled={Load}  className={classes.RegisterField} autoComplete="off" name={"phoneNumber"} placeholder={strings.phoneNumber}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="phoneNumber" />
 
-       <div>
-       <button disabled={Load} type='submit' >
+            <Field disabled={Load}  className={classes.RegisterField} autoComplete="off" name={"userName"} placeholder={strings.userName}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="userName" />
+
+            <Field  disabled={Load}  className={classes.RegisterField} autoComplete="off" name={"password"} type='password' placeholder={strings.Password}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="password" />
+
+            <Field  disabled={Load}  className={classes.RegisterField} autoComplete="off" name={"cpassword"} type='password' placeholder={strings.cPassword}/>
+            <ErrorMessage className={classes.ErrorMessage} component="span" name="cpassword" />
+           <button disabled={Load} type='submit' >
             {Load?(<>
               <div className="spinner-border spinner-border-sm" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
-            </>):(<>{strings.Login}</>)}
+            </>):(<>{strings.register}</>)}
             
             </button>
-    
-
-       </div>
- 
- 
-  
-
                      </Form>
           )}
 
         </Formik>
 
 
- <div className='my-1'>
- {strings.Donthaveaccount} <Link href="/register">{strings.createanaccount}</Link>
+
+        <div className='my-1'>
+ {strings.haveaccount} <Link href="/login">{strings.signin}</Link>
  </div>
 
  <Copyright/>
