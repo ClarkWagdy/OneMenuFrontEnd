@@ -50,7 +50,7 @@ export default function Login(){
       }
      
 
-  
+   
   
 return(<>
   <Head />
@@ -91,7 +91,9 @@ return(<>
           onSubmit={async (values, actions) => {
 
             setLoad(true)
-            axios.post(`${url}/user/login`,{...values}  )
+            axios.post(`${url}/user/login`,{...values} ,{headers:{
+              "x-requested-with":'xmlhttprequest',
+            }} )
             .then(function (response) {
               if(response.status===200){
                 var user:UserT={...response.data.data.user};
