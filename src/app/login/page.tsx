@@ -91,7 +91,7 @@ return(<>
           onSubmit={async (values, actions) => {
 
             setLoad(true)
-            axios.post(`${url}/user/login`,{...values} )
+            axios.post(`${url}/user/login`,{...values}  )
             .then(function (response) {
               if(response.status===200){
                 var user:UserT={...response.data.data.user};
