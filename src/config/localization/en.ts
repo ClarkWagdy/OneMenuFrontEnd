@@ -54,4 +54,7 @@ export const en={
     userName:"Choose username",
     cPassword:"Confirm password",
     Passwordsmustmatch:'Passwords must match',
+    Anewaccounthasbeencreated:"A new account has been created",
+    Wewillcallyousoon:"We will call you soon",
+    Thisuseralreadyexists:"This user already exists",
 }

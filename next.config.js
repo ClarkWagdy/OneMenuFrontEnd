@@ -10,6 +10,14 @@ const nextConfig = {
   // experimental: {
   //   appDir: true,
   // },
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: 'https://clarkgerges-001-site1.ctempurl.com/:path*',
+      },
+    ]
+  },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
@@ -21,7 +29,7 @@ const nextConfig = {
   },
 
 }
-
+ 
 module.exports = nextConfig
 
  

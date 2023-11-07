@@ -10,6 +10,8 @@ import {
     ErrorMessage,
     FieldProps,
   } from 'formik';
+  import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
   import * as Yup from 'yup';
 import { strings } from '@/config/localization/LocalizedStrings';
 import { Languages, LanguagesTitle } from '@/config/localization/Languages';
@@ -28,6 +30,7 @@ import Head from './head';
 
 export default function Register(){
     const [Load, setLoad] = useState<boolean>(false); 
+    const [Done, setDone] = useState<boolean>(false); 
 
     const _Lan = useAppSelector((state) => state.Lan)
     const dispatch = useAppDispatch();
@@ -55,6 +58,9 @@ export default function Register(){
 return(<>
 
 <Head />
+<ToastContainer rtl={strings.getLanguage()===Languages.AR?true:false} />
+
+
  <div className={classes.LanguagePart}>
           <button className={classes.LanBtn} onClick={() => HandleLanChange()}>
             {_Lan === Languages.AR ? LanguagesTitle.EN : LanguagesTitle.AR}
@@ -70,22 +76,40 @@ return(<>
  
 </section>
 
+
+{Done?(
+  <section  className={"animate__animated  animate__fadeInUp " +classes.RegisterForm}>
+
+
+
+
+
+
+
+<Image className={"animate__backInUp animate__animated  "+classes.Logo} src="/Image/done.png" width={250} height={250} alt="done"  />
+
+
+  <div className="animate__backInUp animate__animated ">
+
+  <h2>{strings.Anewaccounthasbeencreated}</h2>
+      <p>{strings.Wewillcallyousoon} </p>
+
+      <Copyright/>
+  </div>
+  
+
+  
+
+  </section>
+):(
+
 <section  className={"animate__animated  animate__fadeInUp " +classes.RegisterForm}>
+
 
 <div>
 <h2>{strings.Welcomeback}</h2>
     <p>{strings.Menumanagementsystem} </p>
 </div>
-
-
-
-{/* "name": "string",
-  "phoneNumber": "string",
-  "email": "string",
-  "userName": "string",
-  "password": "string",
-  "type": 0 */}
-
 
 <Formik
           enableReinitialize={true}
@@ -112,16 +136,34 @@ return(<>
             setLoad(true)
             axios.post(`${url}/user/register`,{...values} )
             .then(function (response) {
-              if(response.status===200){
-                  console.log(response)
-              }
+              console.log(response.data)
+              if(response.data.statusCode===202){
+                setDone(true)
+                setTimeout(() => {
+                  router.replace(`/`);
+                }, 8000);
+
+              } 
               
             
             })
             .catch(function (error) {
               // handle error
               setLoad(false)
-              console.log(error);
+              if(error.response.data.error.message.toLowerCase().includes('duplicate')){
+                
+                toast.error(strings.Thisuseralreadyexists, {
+                  position: "bottom-right",
+                  autoClose: 25000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  });
+                  actions.resetForm();
+              }
             }) 
             
          
@@ -168,7 +210,7 @@ return(<>
 
  <Copyright/>
 </section>
-
+)}
  </div>
  
 </>)

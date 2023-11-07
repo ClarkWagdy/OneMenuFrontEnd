@@ -54,5 +54,8 @@ export const ar={
         userName:"اختر اسم المستخدم",
         cPassword:"تأكيد كلمة المرور",
         Passwordsmustmatch:"يجب أن تتطابق كلمات المرور",
+        Anewaccounthasbeencreated:"تم انشاء حساب جديد",
+        Wewillcallyousoon:"سنتصل بك قريبا",
+        Thisuseralreadyexists:"هذا المستخدم موجود مسبقا"
 
 }

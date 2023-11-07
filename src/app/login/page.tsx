@@ -3,6 +3,8 @@ import React, { FC, useState } from 'react'
 import classes from "./login.module.css";
 import Image from 'next/image'
 import Copyright from "@/Component/Copyright/Copyright";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
     Formik, 
     Form,
@@ -54,6 +56,7 @@ export default function Login(){
   
 return(<>
   <Head />
+  <ToastContainer rtl={strings.getLanguage()===Languages.AR?true:false} />
  <div className={classes.LanguagePart}>
           <button className={classes.LanBtn} onClick={() => HandleLanChange()}>
             {_Lan === Languages.AR ? LanguagesTitle.EN : LanguagesTitle.AR}
@@ -95,7 +98,11 @@ return(<>
               "x-requested-with":'xmlhttprequest',
             }} )
             .then(function (response) {
-              if(response.status===200){
+
+           
+
+
+              if(response.data.statusCode===200){
                 var user:UserT={...response.data.data.user};
                 var restaurant:RestaurantT={...response.data.data.restaurant};
                 user.RestaurantId=restaurant.id;
@@ -103,8 +110,19 @@ return(<>
                 dispatch(SetRestaurant(restaurant));              
                 router.replace(`/menu/${restaurant.id}`);
               }
-              
-            
+              else if(response.data.statusCode===404){
+                toast.error(strings.getLanguage()===Languages.AR?response.data.messageAr:response.data.messageEn, {
+                  position: "bottom-right",
+                  autoClose: 25000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                  });
+              }
+              setLoad(false)
             })
             .catch(function (error) {
               // handle error
