@@ -57,4 +57,5 @@ export const en={
     Anewaccounthasbeencreated:"A new account has been created",
     Wewillcallyousoon:"We will call you soon",
     Thisuseralreadyexists:"This user already exists",
+    Dashboard:"Dashboard",
 }

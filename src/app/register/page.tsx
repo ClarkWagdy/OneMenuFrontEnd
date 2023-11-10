@@ -27,6 +27,7 @@ import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import { redirect, useRouter } from 'next/navigation'
 import Link from 'next/link';
 import Head from './head';
+import Authenticating from '@/config/Authenticating/Authenticating';
 
 export default function Register(){
     const [Load, setLoad] = useState<boolean>(false); 
@@ -46,15 +47,7 @@ export default function Register(){
         }
       }
  
-      let user=localStorage.getItem('User'); 
-      if(user !== null && user !== undefined){ 
-        let userdata=JSON.parse(user) as UserT; 
-        redirect(`menu/${userdata.RestaurantId}`); 
-      }
-     
-
-  
-  
+      Authenticating()
 return(<>
 
 <Head />

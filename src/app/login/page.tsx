@@ -25,8 +25,10 @@ import { UserT } from '@/config/Store/User/UserType';
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import { redirect, useRouter } from 'next/navigation'
-import Link from 'next/link';
-import Head from './head';
+import Link from 'next/link'; 
+import { UserEnum } from '@/config/UserEnum/UserEnum';
+import Authenticating from '@/config/Authenticating/Authenticating';
+import HeadTag from '@/Component/Head/HeadTag';
 
 export default function Login(){
     const [Load, setLoad] = useState<boolean>(false); 
@@ -45,17 +47,13 @@ export default function Login(){
         }
       }
  
-      let user=localStorage.getItem('User'); 
-      if(user !== null && user !== undefined){ 
-        let userdata=JSON.parse(user) as UserT; 
-        redirect(`menu/${userdata.RestaurantId}`); 
-      }
-     
-
    
+      Authenticating( )
+
   
 return(<>
-  <Head />
+     <HeadTag title={strings.signin} description="All in one chip" keywords={"One card, NFC, nfc, chip"}/>
+
   <ToastContainer rtl={strings.getLanguage()===Languages.AR?true:false} />
  <div className={classes.LanguagePart}>
           <button className={classes.LanBtn} onClick={() => HandleLanChange()}>
@@ -99,16 +97,25 @@ return(<>
             }} )
             .then(function (response) {
 
-           
+           console.log(response.data,response.data.data.statusCode)
 
 
-              if(response.data.statusCode===200){
+              if(response.data.statusCode===200||response.data.statusCode===202){
                 var user:UserT={...response.data.data.user};
+           
+              
+              if(user.type===UserEnum.Admin){
+                router.replace(`/dashboard`);
+                dispatch(SetUser(user));
+              }else   if(user.type===UserEnum.Owner){
                 var restaurant:RestaurantT={...response.data.data.restaurant};
+               
                 user.RestaurantId=restaurant.id;
                 dispatch(SetUser(user));
                 dispatch(SetRestaurant(restaurant));              
                 router.replace(`/menu/${restaurant.id}`);
+              }
+               
               }
               else if(response.data.statusCode===404){
                 toast.error(strings.getLanguage()===Languages.AR?response.data.messageAr:response.data.messageEn, {

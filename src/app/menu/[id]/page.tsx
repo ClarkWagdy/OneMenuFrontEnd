@@ -28,6 +28,7 @@ import Swal from 'sweetalert2';
  
 import {  toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
+import Authenticating from '@/config/Authenticating/Authenticating';
  
 
 
@@ -40,7 +41,7 @@ export default function Page(){
   const User = useAppSelector((state) => state.User);
   const Restaurant  = useAppSelector((state) => state.Restaurant);
   const dispatch = useAppDispatch();
-
+  Authenticating()
 
   useEffect(()=>{  
       if(Object.keys(Restaurant).length===0 && params?.id){

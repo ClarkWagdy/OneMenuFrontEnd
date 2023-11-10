@@ -1,0 +1,49 @@
+.Dashboard{
+ 
+    background-color: #3f3f3f;
+    transition: all 250ms;
+    min-height: 100vh;
+
+}
+.Dashboard>div{
+    min-height: 100vh;
+}
+.ActionList{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 250ms;
+}
+.ListOfAction{
+    position: fixed;
+    background-color: rgba(255,255,255,0.2);
+    height: 80% !important;
+    border-radius: 15px;
+ padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  .ActionButton{
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.8);
+    transition: all 350ms;
+  svg{
+    path{
+        fill: rgba(0,0,0,0.5);
+        transition: all 350ms;
+    }
+  }
+  &:hover{
+    transform: scale(1.05);
+    svg{
+        path{
+            fill: #3f3f3f; 
+        }
+      }
+    }
+}
+}
+ 

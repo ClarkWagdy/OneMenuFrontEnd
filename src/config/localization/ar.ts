@@ -56,6 +56,7 @@ export const ar={
         Passwordsmustmatch:"يجب أن تتطابق كلمات المرور",
         Anewaccounthasbeencreated:"تم انشاء حساب جديد",
         Wewillcallyousoon:"سنتصل بك قريبا",
-        Thisuseralreadyexists:"هذا المستخدم موجود مسبقا"
+        Thisuseralreadyexists:"هذا المستخدم موجود مسبقا",
+        Dashboard:"لوحة التحكم"
 
 }
