@@ -23,7 +23,7 @@ import { CategoryDTO, ProductDTO, RestaurantT } from '@/config/Store/Restaurant/
 import axios from 'axios';
 import { useParams } from 'next/navigation'
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
-import { OffersImagePath, url, VideoPath } from '@/config/Api/url'; 
+import { OffersImagePath, RestaurantLogoPath, url, VideoPath } from '@/config/Api/url'; 
 import Swal from 'sweetalert2';
  
 import {  toast } from 'react-toastify';
@@ -41,10 +41,11 @@ export default function Page(){
   const User = useAppSelector((state) => state.User);
   const Restaurant  = useAppSelector((state) => state.Restaurant);
   const dispatch = useAppDispatch();
-  Authenticating()
+
 
   useEffect(()=>{  
-      if(Object.keys(Restaurant).length===0 && params?.id){
+    
+      if(!Restaurant||Object.keys(Restaurant).length===0 && params?.id){
         dispatch(SetLoad(true));
         axios.get(`${url}/restaurant/by-id/${params?.id}`)
     .then(  function (response) {
@@ -78,7 +79,8 @@ if(Restaurant.categories){
 
 
 },[Restaurant.categories])
-  function HandleLanChange() {
+ 
+function HandleLanChange() {
     if (_Lan === Languages.AR) {
       dispatch(SetLan(Languages.EN))
 
@@ -328,7 +330,7 @@ useEffect(()=>{
             <div className={classes.restaurantDetails} style={{ backgroundColor: `rgba(${Restaurant?Restaurant.color:'63, 63, 63'},0.2)` }}>
               <img
                 className={classes.LogoImg}
-                src={Restaurant?Restaurant.logo:''}
+                src={Restaurant?`${RestaurantLogoPath}/${Restaurant.logo}`:''}
 
                 alt="" />
             </div>

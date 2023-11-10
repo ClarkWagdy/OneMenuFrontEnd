@@ -11,19 +11,19 @@ import { UserEnum } from '../UserEnum/UserEnum';
       let userdata=JSON.parse(user) as UserT;
   
       if(userdata.type===UserEnum.Admin){
-        redirect( 'dashboard' ); 
+        redirect( '/dashboard' ); 
       }else if(userdata.type===UserEnum.Owner &&userdata.RestaurantId){
-        redirect( `menu/${userdata.RestaurantId}`); 
+        redirect( `/menu/${userdata.RestaurantId}`); 
       }else{
         redirect('/')
       }       
     }
-    else{
-      console.log(window.location.href)
-       if(window.location.href.includes('dashboard')){
-         redirect('/login')
-       }
-     }
+    // else{
+    //   console.log(window.location.href)
+    //    if(window.location.href.includes('dashboard')){
+    //      redirect('/login')
+    //    }
+    //  }
 
 } 
 }

@@ -43,6 +43,7 @@ export default function Layout({ children}:RootLayoutProps) {
      }
  
     }
+    
   return (
     <html lang={strings.getLanguage()} dir={strings.getLanguage()===Languages.AR?"rtl":"ltr"} >
       {/*

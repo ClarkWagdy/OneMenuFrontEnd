@@ -97,13 +97,13 @@ return(<>
             }} )
             .then(function (response) {
 
-           console.log(response.data,response.data.data.statusCode)
+     
 
 
               if(response.data.statusCode===200||response.data.statusCode===202){
                 var user:UserT={...response.data.data.user};
            
-              
+                console.log(response.data,user.type===UserEnum.Owner)
               if(user.type===UserEnum.Admin){
                 router.replace(`/dashboard`);
                 dispatch(SetUser(user));
