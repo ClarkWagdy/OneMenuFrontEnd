@@ -9,21 +9,23 @@ import { UserEnum } from '../UserEnum/UserEnum';
  const user = window.localStorage.getItem('User'); 
     if(user){ 
       let userdata=JSON.parse(user) as UserT;
-  
-      if(userdata.type===UserEnum.Admin){
+      
+      if(window.location.href.includes('dashboard') && userdata.type!=UserEnum.Admin){
+        redirect('/login')
+      }
+      else if(userdata.type===UserEnum.Admin){
         redirect( '/dashboard' ); 
       }else if(userdata.type===UserEnum.Owner &&userdata.RestaurantId){
         redirect( `/menu/${userdata.RestaurantId}`); 
       }else{
         redirect('/')
       }       
-    }
-    // else{
-    //   console.log(window.location.href)
-    //    if(window.location.href.includes('dashboard')){
-    //      redirect('/login')
-    //    }
-    //  }
 
+    
+    }
+//     else{
+//          redirect('/')
+// }
 } 
+
 }

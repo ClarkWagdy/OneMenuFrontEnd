@@ -1,4 +1,4 @@
-//  const link='https://localhost:44357'
+  //const link='https://localhost:44357'
 const link='https://clarkgerges-001-site1.ctempurl.com';
  export const url =`${link}/api/app`;
  export const RestaurantLogoPath=`${link}/images/Restaurant/Logo`

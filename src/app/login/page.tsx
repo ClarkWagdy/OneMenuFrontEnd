@@ -92,9 +92,7 @@ return(<>
           onSubmit={async (values, actions) => {
 
             setLoad(true)
-            axios.post(`${url}/user/login`,{...values} ,{headers:{
-              "x-requested-with":'xmlhttprequest',
-            }} )
+            axios.post(`${url}/user/login`,{...values} )
             .then(function (response) {
 
      
@@ -105,7 +103,7 @@ return(<>
            
                 console.log(response.data,user.type===UserEnum.Owner)
               if(user.type===UserEnum.Admin){
-                router.replace(`/dashboard`);
+                router.push(`/dashboard`);
                 dispatch(SetUser(user));
               }else   if(user.type===UserEnum.Owner){
                 var restaurant:RestaurantT={...response.data.data.restaurant};
@@ -113,7 +111,7 @@ return(<>
                 user.RestaurantId=restaurant.id;
                 dispatch(SetUser(user));
                 dispatch(SetRestaurant(restaurant));              
-                router.replace(`/menu/${restaurant.id}`);
+                router.push(`/menu/${restaurant.id}`);
               }
                
               }

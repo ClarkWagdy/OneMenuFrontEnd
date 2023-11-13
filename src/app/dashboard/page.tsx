@@ -1,5 +1,6 @@
-import React from 'react'
- 
+"use client";
+import React, { useEffect  } from 'react'
+
 import classes from './Dashboard.module.scss'
 import Authenticating from '@/config/Authenticating/Authenticating'
 import HeadTag from '@/Component/Head/HeadTag'
@@ -9,8 +10,10 @@ import Image from 'next/image'
 export default function Dashboard() {
 
 
-  
+  useEffect(()=>{
     Authenticating();
+  },[])
+
     
   return (
     <>
