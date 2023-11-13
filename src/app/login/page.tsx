@@ -24,7 +24,7 @@ import { SetUser } from '@/config/Store/User/UserSlice';
 import { UserT } from '@/config/Store/User/UserType';
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
-import { redirect, useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'; 
 import Link from 'next/link'; 
 import { UserEnum } from '@/config/UserEnum/UserEnum';
 import Authenticating from '@/config/Authenticating/Authenticating';
@@ -35,7 +35,7 @@ export default function Login(){
 
     const _Lan = useAppSelector((state) => state.Lan)
     const dispatch = useAppDispatch();
-    const router = useRouter();
+ 
     function HandleLanChange() {
         if (_Lan === Languages.AR) {
           dispatch(SetLan(Languages.EN))
@@ -103,15 +103,16 @@ return(<>
            
                 console.log(response.data,user.type===UserEnum.Owner)
               if(user.type===UserEnum.Admin){
-                router.push(`/dashboard`);
+              
                 dispatch(SetUser(user));
+                redirect(`/dashboard`);
               }else   if(user.type===UserEnum.Owner){
                 var restaurant:RestaurantT={...response.data.data.restaurant};
                
                 user.RestaurantId=restaurant.id;
                 dispatch(SetUser(user));
                 dispatch(SetRestaurant(restaurant));              
-                router.push(`/menu/${restaurant.id}`);
+                redirect(`/menu/${restaurant.id}`);
               }
                
               }
