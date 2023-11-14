@@ -198,13 +198,13 @@ transform: scale(1.05);
         }
         .Mediasection{
  
-            height: 30dvh;
+            height: 40dvh;
         }
         .MenuCard{
             height: calc(100dvh - 30dvh + 25px) !important;
         }
         .Mediasection>div>video{
-            height: 30dvh;
+            height: 40dvh;
   
         }
         .AllProductContainer,.AllProductCard{
