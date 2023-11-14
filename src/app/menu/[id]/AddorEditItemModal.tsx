@@ -105,7 +105,7 @@ const AddorEditItemModal: FC<Props> = (props) => {
         <Formik
           enableReinitialize={true}
           initialValues={{
-            image: props.product ? `${productImagePath}/${props.product.image}` : itemImage.src,
+            image: props.product ? `${productImagePath}/${props.product.image}` : "",
             nameAr: props.product ? props.product.nameAr : "",
             nameEn: props.product ? props.product.nameEn : "",
             descAR: props.product ? props.product.descAR?props.product.descAR:"" : "",
@@ -223,7 +223,7 @@ const AddorEditItemModal: FC<Props> = (props) => {
           {({ errors, touched, values, setFieldValue ,isValid}) => (
             <Form className={classes.AddItemForm}>
               <div className={classes.AddItemImageForm}>
-                <img src={values.image} alt="" />
+                <img src={values.image?values.image:itemImage.src} alt="" />
  
                 <label htmlFor='ItemProduct' style={{ backgroundColor: `rgb(${Restaurant.color})` }}>
                   {props.product && props.product.image ? (
@@ -234,7 +234,14 @@ const AddorEditItemModal: FC<Props> = (props) => {
                   )}
                 </label>
                 <input id='ItemProduct' type="file" accept='image/*' onChange={($e) => onChangeImage($e,setFieldValue)} />
+                
+                <div className='w-100 my-2 d-flex justify-content-center'>
+<ErrorMessage className={classes.ErrorMessage} component="span" name="image" />
+
+</div>
+
               </div>
+
               <div className='my-1 w-100'>
                 <h5 className='p-0 m-0'>{strings.ItemName}</h5>
                 <div className={classes.Inputsflexcenter}>

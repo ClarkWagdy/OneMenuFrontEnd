@@ -617,7 +617,9 @@ transition: all 250me;
      .AddItemImageForm{
         position: relative;
         display: flex;
-        justify-content: flex-end;
+        flex-direction: column;
+        align-items: end;
+      
         
      }
      .AddItemImageForm label{
