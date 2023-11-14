@@ -220,18 +220,18 @@ transform: scale(1.05);
     
         .Mediasection{
  
-            height: 20dvh;
+            height: 30dvh;
         }
         .MenuCard{
-            height: calc(100dvh - 20dvh + 25px) !important;
+            height: calc(100dvh - 30dvh + 25px) !important;
         }
         .Mediasection>div>video{
-            height: 20dvh;
+            height: 30dvh;
   
         }
         .AllProductContainer,.AllProductCard{
      
-            height: calc(100dvh - 20dvh - 32px);
+            height: calc(100dvh - 30dvh - 32px);
           
         
         } 
