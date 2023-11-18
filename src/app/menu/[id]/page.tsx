@@ -19,7 +19,7 @@ import AddorEditItemModal from './AddorEditItemModal';
 import SettingsModal from './SettingsModal';
 import NoItems from '@/Component/NoItems/NoItems';
 import { SetLoad } from '@/config/Store/Load/LoadSlice';
-import { CategoryDTO, ProductDTO, RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
+import { AdvertisingMediaDTO, CategoryDTO, ProductDTO, RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import axios from 'axios';
 import { useParams } from 'next/navigation'
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
@@ -376,7 +376,7 @@ export default function Page() {
 
 
             >
-              {Restaurant.offers && Restaurant.offers.length > 0 ? Restaurant.offers.map(ele => {
+              {Restaurant.offers && Restaurant.offers.length > 0 ? Restaurant.offers.map((ele: AdvertisingMediaDTO) => {
                 return (<SwiperSlide key={ele.id}>
                   <img
                     className={classes.SwiperImage}
