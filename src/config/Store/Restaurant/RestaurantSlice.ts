@@ -8,7 +8,7 @@ import { RestaurantT } from './RestaurantType';
 
 export const RestaurantSlicer = createSlice({
     name: "Restaurant",
-    initialState: JSON.parse(localStorage.getItem('Restaurant') || '{}') as RestaurantT,
+    initialState: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('Restaurant') || '{}') : {} as RestaurantT,
     reducers: {
         SetRestaurant(_state, action) {
             localStorage.setItem("Restaurant", JSON.stringify(action.payload))
