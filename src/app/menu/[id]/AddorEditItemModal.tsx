@@ -2,7 +2,7 @@ import { Languages } from '@/config/localization/Languages';
 import { useAppSelector } from '@/config/Store/hooks';
 import React, { FC, useState } from 'react'
 import { Modal } from 'react-bootstrap'
-import classes from '../Menu.module.css';
+import classes from '../Menu.module.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { strings } from '@/config/localization/LocalizedStrings';
 import itemImage from '../../../../public/Image/item.webp';

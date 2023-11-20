@@ -1,7 +1,7 @@
 'use client'
 
 import { FC, useState, useEffect } from 'react'
-import classes from '../Menu.module.css';
+import classes from '../Menu.module.scss';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper";
 import "swiper/css";
@@ -12,7 +12,6 @@ import { strings } from '@/config/localization/LocalizedStrings';
 import { useAppDispatch, useAppSelector } from '@/config/Store/hooks';
 import { SetLan } from '@/config/Store/Lan/LanSlice';
 import AddorEditcategoryModal from './AddorEditcategoryModal';
-
 import ItemCard from './ItemCard';
 import { UserT, UserType } from '@/config/Store/User/UserType';
 import AddorEditItemModal from './AddorEditItemModal';
@@ -25,13 +24,10 @@ import { useParams } from 'next/navigation'
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { OffersImagePath, RestaurantLogoPath, url, VideoPath } from '@/config/Api/url';
 import Swal from 'sweetalert2';
-
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut';
 import HeadTag from '@/Component/Head/HeadTag';
-
-
 
 export default function Page() {
   const params = useParams()
@@ -39,6 +35,8 @@ export default function Page() {
   const [CreateOrEditcategoryModal, setCreateOrEditcategoryModal] = useState<boolean>(false);
   const [CreateOrEditItemModal, setCreateOrEditItemModal] = useState<boolean>(false);
   const [SettingModal, setSettingModal] = useState<boolean>(false);
+  const [EditFlag, setEditFlag] = useState<boolean>(false);
+
   const User = useAppSelector((state) => state.User);
   const Restaurant = useAppSelector((state) => state.Restaurant);
   const dispatch = useAppDispatch();
@@ -326,13 +324,13 @@ export default function Page() {
                 </button>
               ) : ""}
             </div>
-            {User.type === UserType.Admin || User.type === UserType.Owner && (
-              <button className={classes.LanBtn} onClick={() => HandleLogOut()}>
-                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="35" height="35" x="0" y="0" viewBox="0 0 6.35 6.35"  ><g><path d="M3.172.53a.265.266 0 0 0-.262.268v2.127a.265.266 0 0 0 .53 0V.798A.265.266 0 0 0 3.172.53zm1.544.532a.265.266 0 0 0-.026 0 .265.266 0 0 0-.147.47c.459.391.749.973.749 1.626 0 1.18-.944 2.131-2.116 2.131A2.12 2.12 0 0 1 1.06 3.16c0-.65.286-1.228.74-1.62a.265.266 0 1 0-.344-.404A2.667 2.667 0 0 0 .53 3.158a2.66 2.66 0 0 0 2.647 2.663 2.657 2.657 0 0 0 2.645-2.663c0-.812-.363-1.542-.936-2.03a.265.266 0 0 0-.17-.066z" fill="tomato" opacity="1" data-original="#000000" ></path></g></svg>
+            {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+              <button className={classes.LanBtn + " animate__animated animate__fadeIn"} onClick={() => HandleLogOut()}>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="40" height="40" x="0" y="0" viewBox="0 0 24 24"   ><g><g fill="tomato"><path d="M12 3.25a.75.75 0 0 1 0 1.5 7.25 7.25 0 0 0 0 14.5.75.75 0 0 1 0 1.5 8.75 8.75 0 1 1 0-17.5z" fill="tomato" opacity="1" data-original="tomato" ></path><path d="M16.47 9.53a.75.75 0 0 1 1.06-1.06l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H10a.75.75 0 0 1 0-1.5h8.19z" fill="tomato" opacity="1" data-original="tomato" ></path></g></g></svg>
               </button>
             )}
-            {User.type === UserType.Admin || User.type === UserType.Owner && (
-              <button onClick={() => { setSettingModal(true) }} className={classes.btn + " " + classes.btnSettings}>
+            {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+              <button onClick={() => { setSettingModal(true) }} className={classes.btn + " animate__animated animate__fadeIn " + classes.btnSettings}>
 
                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 32 32"  ><g><path d="M29.21 11.84a3.92 3.92 0 0 1-3.09-5.3 1.84 1.84 0 0 0-.55-2.07 14.75 14.75 0 0 0-4.4-2.55 1.85 1.85 0 0 0-2.09.58 3.91 3.91 0 0 1-6.16 0 1.85 1.85 0 0 0-2.09-.58 14.82 14.82 0 0 0-4.1 2.3 1.86 1.86 0 0 0-.58 2.13 3.9 3.9 0 0 1-3.25 5.36 1.85 1.85 0 0 0-1.62 1.49A14.14 14.14 0 0 0 1 16a14.32 14.32 0 0 0 .19 2.35 1.85 1.85 0 0 0 1.63 1.55A3.9 3.9 0 0 1 6 25.41a1.82 1.82 0 0 0 .51 2.18 14.86 14.86 0 0 0 4.36 2.51 2 2 0 0 0 .63.11 1.84 1.84 0 0 0 1.5-.78 3.87 3.87 0 0 1 3.2-1.68 3.92 3.92 0 0 1 3.14 1.58 1.84 1.84 0 0 0 2.16.61 15 15 0 0 0 4-2.39 1.85 1.85 0 0 0 .54-2.11 3.9 3.9 0 0 1 3.13-5.39 1.85 1.85 0 0 0 1.57-1.52A14.5 14.5 0 0 0 31 16a14.35 14.35 0 0 0-.25-2.67 1.83 1.83 0 0 0-1.54-1.49zM21 16a5 5 0 1 1-5-5 5 5 0 0 1 5 5z" data-name="Layer 2" fill="#000000" data-original="#000000" ></path></g></svg>
               </button>
@@ -410,7 +408,7 @@ export default function Page() {
                 navigation={false}
 
                 modules={[Pagination]}
-                className={classes.SwiperMenuList + `    ${User.type === UserType.Admin || User.type === UserType.Owner ? classes.PadInEnd40px : " "}`}
+                className={classes.SwiperMenuList + ` ${User.type === UserType.Admin || User.type === UserType.Owner ? classes.PadInEnd40px : " "}`}
               >
                 {category.map(Categ => {
 
@@ -427,8 +425,8 @@ export default function Page() {
                 })}
               </Swiper>)}
 
-            {User.type === UserType.Admin || User.type === UserType.Owner && (
-              <>
+            {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+              <div className='animate__fadeIn animate__animated'>
                 {category.length === 0 && (
                   <div>
                     <h4 className='p-0 m-0'>{strings.Categories}</h4>
@@ -446,7 +444,7 @@ export default function Page() {
                       <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="15" height="15" x="0" y="0" viewBox="0 0 492.493 492"   ><g><path d="M304.14 82.473 33.165 353.469a10.799 10.799 0 0 0-2.816 4.949L.313 478.973a10.716 10.716 0 0 0 2.816 10.136 10.675 10.675 0 0 0 7.527 3.114 10.6 10.6 0 0 0 2.582-.32l120.555-30.04a10.655 10.655 0 0 0 4.95-2.812l271-270.977zM476.875 45.523 446.711 15.36c-20.16-20.16-55.297-20.14-75.434 0l-36.949 36.95 105.598 105.597 36.949-36.949c10.07-10.066 15.617-23.465 15.617-37.715s-5.547-27.648-15.617-37.719zm0 0" fill="#000000" data-original="#000000"  ></path></g></svg>)}
                   </button>
                 </div>
-              </>
+              </div>
             )}
           </div>
           <div className={classes.AllProductContainer}>
@@ -461,12 +459,12 @@ export default function Page() {
                 </div>
               </>) : MenuItems.length > 0 ? MenuItems.map((product, i) => {
                 return (
-                  <ItemCard key={i + product.nameEn} product={product} DeleteItem={DeleteItem} EditItem={EditItem} />
+                  <ItemCard key={i + product.nameEn} product={product} EditFlag={EditFlag} DeleteItem={DeleteItem} EditItem={EditItem} />
                 )
               }) : (<NoItems />)}
 
-              {User.type === UserType.Admin || User.type === UserType.Owner && (
-                <div onClick={() => { setCreateOrEditItemModal(true) }} className={`${MenuItems.length > 0 ? `${classes.ProductCard + " " + classes.AddProductCard}` : classes.AddBtn}`}
+              {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+                <div onClick={() => { setCreateOrEditItemModal(true) }} className={`animate__fadeIn animate__animated  ${MenuItems.length > 0 ? `${classes.ProductCard + " " + classes.AddProductCard}` : classes.AddBtn}`}
                   style={MenuItems.length > 0 ? { backgroundColor: `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'},0.1)`, borderColor: `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'})` } : {}}>
 
                   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 448 448"   ><g><path d="M408 184H272a8 8 0 0 1-8-8V40c0-22.09-17.91-40-40-40s-40 17.91-40 40v136a8 8 0 0 1-8 8H40c-22.09 0-40 17.91-40 40s17.91 40 40 40h136a8 8 0 0 1 8 8v136c0 22.09 17.91 40 40 40s40-17.91 40-40V272a8 8 0 0 1 8-8h136c22.09 0 40-17.91 40-40s-17.91-40-40-40zm0 0" fill={`rgba(${Restaurant ? Restaurant.color : '63, 63, 63'})`} data-original="#000000" ></path></g></svg>
@@ -500,6 +498,25 @@ export default function Page() {
 
 
         <ToastContainer />
+
+
+
+        {User.type === UserType.Admin || User.type === UserType.Owner && (
+          <button
+            className={classes.AddIconCard + " animate__animated animate__fadeIn " + classes.EditViewBtn}
+            onMouseEnter={ele => { ele.currentTarget.style.backgroundColor = `rgba(${Restaurant.color})` }} onMouseLeave={ele => { ele.currentTarget.style.backgroundColor = 'rgba(0, 0, 0,0.8)' }}
+            onClick={() => setEditFlag(!EditFlag)} >
+            {EditFlag ? (
+              <div className='animate__animated animate__fadeIn '>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 511.999 511.999" ><g><path d="M508.745 246.041c-4.574-6.257-113.557-153.206-252.748-153.206S7.818 239.784 3.249 246.035a16.896 16.896 0 0 0 0 19.923c4.569 6.257 113.557 153.206 252.748 153.206s248.174-146.95 252.748-153.201a16.875 16.875 0 0 0 0-19.922zM255.997 385.406c-102.529 0-191.33-97.533-217.617-129.418 26.253-31.913 114.868-129.395 217.617-129.395 102.524 0 191.319 97.516 217.617 129.418-26.253 31.912-114.868 129.395-217.617 129.395z" fill="#000000" opacity="1" data-original="#000000" ></path><path d="M255.997 154.725c-55.842 0-101.275 45.433-101.275 101.275s45.433 101.275 101.275 101.275S357.272 311.842 357.272 256s-45.433-101.275-101.275-101.275zm0 168.791c-37.23 0-67.516-30.287-67.516-67.516s30.287-67.516 67.516-67.516 67.516 30.287 67.516 67.516-30.286 67.516-67.516 67.516z" fill="#000000" opacity="1" data-original="#000000" ></path></g></svg>
+              </div>
+            ) : (
+              <div className='animate__animated animate__fadeIn '>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 492.493 492"   ><g><path d="M304.14 82.473 33.165 353.469a10.799 10.799 0 0 0-2.816 4.949L.313 478.973a10.716 10.716 0 0 0 2.816 10.136 10.675 10.675 0 0 0 7.527 3.114 10.6 10.6 0 0 0 2.582-.32l120.555-30.04a10.655 10.655 0 0 0 4.95-2.812l271-270.977zM476.875 45.523 446.711 15.36c-20.16-20.16-55.297-20.14-75.434 0l-36.949 36.95 105.598 105.597 36.949-36.949c10.07-10.066 15.617-23.465 15.617-37.715s-5.547-27.648-15.617-37.719zm0 0" fill="#000000" data-original="#000000"  ></path></g></svg>
+              </div>
+            )}
+          </button>
+        )}
       </section>
     </>
 
