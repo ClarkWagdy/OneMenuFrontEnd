@@ -69,15 +69,15 @@ export default function Page() {
 
 
   }, [])
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (Restaurant.categories) {
-      setcategory(Restaurant.categories)
-    }
+  //   if (Restaurant.categories) {
+  //     setcategory(Restaurant.categories)
+  //   }
 
 
 
-  }, [Restaurant.categories])
+  // }, [Restaurant.categories])
 
   function HandleLanChange() {
     if (_Lan === Languages.AR) {
