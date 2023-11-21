@@ -426,7 +426,7 @@ export default function Page() {
               </Swiper>)}
 
             {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
-              <div className='animate__fadeIn animate__animated'>
+              <div  >
                 {category.length === 0 && (
                   <div>
                     <h4 className='p-0 m-0'>{strings.Categories}</h4>
