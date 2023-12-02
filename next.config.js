@@ -3,14 +3,16 @@
 /**
  * @type {import('next').NextConfig}
  */
- 
+
 const path = require('path')
 
 const nextConfig = {
   // experimental: {
   //   appDir: true,
   // },
- 
+  rules: {
+    "@next/next/no-img-element": "off",
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
@@ -33,8 +35,7 @@ const nextConfig = {
   },
 
 }
- 
+
 module.exports = nextConfig
 
- 
- 
+

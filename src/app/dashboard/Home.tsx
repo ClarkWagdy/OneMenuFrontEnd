@@ -12,7 +12,7 @@ export default function Home() {
                                 <div className="row">
                                     <div className="col-8">
                                         <div className="numbers">
-                                            <p className="text-sm mb-0 text-capitalize font-weight-bold">Today's Money</p>
+                                            <p className="text-sm mb-0 text-capitalize font-weight-bold">Today&apos;s Money</p>
                                             <h5 className="font-weight-bolder mb-0">
                                                 $53,000
                                                 <span className="text-success text-sm font-weight-bolder">+55%</span>
@@ -34,7 +34,7 @@ export default function Home() {
                                 <div className="row">
                                     <div className="col-8">
                                         <div className="numbers">
-                                            <p className="text-sm mb-0 text-capitalize font-weight-bold">Today's Users</p>
+                                            <p className="text-sm mb-0 text-capitalize font-weight-bold">Today&apos;s Users</p>
                                             <h5 className="font-weight-bolder mb-0">
                                                 2,300
                                                 <span className="text-success text-sm font-weight-bolder">+3%</span>
