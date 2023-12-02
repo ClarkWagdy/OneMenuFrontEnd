@@ -19,14 +19,15 @@ export const scan = async () => {
     }
 };
 
-export const onWrite = async () => {
+export const onWrite = async (url) => {
     try {
         const ndef = new window.NDEFReader();
         await ndef.write({
-            records: [{ recordType: "text", data: "Hellow World!" }],
+            records: [{ recordType: "url", data: url }],
         });
-        console.log(`Value Saved!`);
+        return true;
     } catch (error) {
         console.log(error);
+        return false;
     }
 };

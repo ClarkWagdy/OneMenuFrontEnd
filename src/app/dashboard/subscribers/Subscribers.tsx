@@ -13,6 +13,8 @@ import Loading from '@/Component/Loading/Loading';
 import { useQRCode } from 'next-qrcode';
 import { saveAs } from "file-saver";
 import { onWrite } from "@/config/NFC/NFCFunction"
+import Modal from 'react-bootstrap/Modal';
+
 export default function Subscribers() {
     const { Canvas } = useQRCode()
     const [ResturantList, setResturantList] = useState<ResturantT[]>([]);
@@ -20,6 +22,9 @@ export default function Subscribers() {
     const [Name, setName] = useState<string>("");
     const [Load, SetLoad] = useState<boolean>(true);
     const [Count, setCount] = useState<number>(25);
+    const [write, Setwrite] = useState<boolean>(false);
+    const [done, Setdone] = useState<boolean>(false);
+
 
     const [PageNumber, setPageNumber] = useState<number>(1);
 
@@ -74,7 +79,16 @@ export default function Subscribers() {
     //     }
     // };
 
-
+    async function Handlewrite(url: string) {
+        Setwrite(true)
+        let data = await onWrite(url)
+        if (data) {
+            Setdone(true);
+            setTimeout(() => {
+                Setwrite(false)
+            }, 500);
+        }
+    }
     return (
         <div className={classes.H100center + " animate__animated animate__fadeInUp"}>
             <div className={"container-fluid py-4  "}>
@@ -168,8 +182,9 @@ export default function Subscribers() {
                                                                         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="20" height="20" x="0" y="0" viewBox="0 0 515.283 515.283"    ><g><path d="M400.775 515.283H114.507c-30.584 0-59.339-11.911-80.968-33.54C11.911 460.117 0 431.361 0 400.775v-28.628c0-15.811 12.816-28.628 28.627-28.628s28.627 12.817 28.627 28.628v28.628c0 15.293 5.956 29.67 16.768 40.483 10.815 10.814 25.192 16.771 40.485 16.771h286.268c15.292 0 29.669-5.957 40.483-16.771 10.814-10.815 16.771-25.192 16.771-40.483v-28.628c0-15.811 12.816-28.628 28.626-28.628s28.628 12.817 28.628 28.628v28.628c0 30.584-11.911 59.338-33.54 80.968-21.629 21.629-50.384 33.54-80.968 33.54zM257.641 400.774a28.538 28.538 0 0 1-19.998-8.142l-.002-.002-.057-.056-.016-.016c-.016-.014-.03-.029-.045-.044l-.029-.029a.892.892 0 0 0-.032-.031l-.062-.062-114.508-114.509c-11.179-11.179-11.179-29.305 0-40.485 11.179-11.179 29.306-11.18 40.485 0l65.638 65.638V28.627C229.014 12.816 241.83 0 257.641 0s28.628 12.816 28.628 28.627v274.408l65.637-65.637c11.178-11.179 29.307-11.179 40.485 0 11.179 11.179 11.179 29.306 0 40.485L277.883 392.39l-.062.062-.032.031-.029.029c-.014.016-.03.03-.044.044l-.017.016a1.479 1.479 0 0 1-.056.056l-.002.002c-.315.307-.634.605-.96.895a28.441 28.441 0 0 1-7.89 4.995l-.028.012c-.011.004-.02.01-.031.013a28.5 28.5 0 0 1-11.091 2.229z" fill="#3f3f3f" opacity="1" data-original="#3f3f3f" ></path></g></svg>
                                                                     </button>
                                                                 </td>
-                                                                <td>
-                                                                    <button onClick={() => onWrite()}>write</button>
+                                                                <td className='text-center'>
+                                                                    <button className='btn p-0 m-0 p-2' onClick={() => Handlewrite(`${window.location.href}/menu/${ele.id}`)}>
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 512 512" ><g><path d="M504.5 316.61H310.55M504.5 346.91H310.55M390.02 124.68h-79.47M355.02 387.32h-44.47M425.02 124.68h59.28c11.16 0 20.2 9.04 20.2 20.2v222.24c0 11.16-9.04 20.2-20.2 20.2h-94.28M383.28 175.187h20.204M433.789 165.085l-20.204 60.61M464.094 215.593H443.89M7.5 142.18v321.91c0 22.32 18.09 40.41 40.41 40.41h222.23c22.32 0 40.41-18.09 40.41-40.41V47.91c0-22.32-18.09-40.41-40.41-40.41H47.91C25.59 7.5 7.5 25.59 7.5 47.91v59.27M138.821 37.805h40.407" fill="none" stroke="#000000" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" data-original="#000000" ></path><path d="M103.465 147.022c61.271 0 111.118 49.847 111.118 111.118" fill="none" stroke="#000000" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" data-original="#000000" ></path><path d="M103.465 177.327c44.561 0 80.813 36.252 80.813 80.813M103.465 207.631c27.851 0 50.508 22.658 50.508 50.508M103.465 237.936c11.158 0 20.203 9.045 20.203 20.203M73.533 364.978v-60.496l42.472 60.496v-60.609M170.875 304.369H146.31v60.609M146.31 334.099h22.614M242.368 309.544a30.161 30.161 0 0 0-16.944-5.176c-16.737 0-30.305 13.568-30.305 30.305 0 16.737 13.568 30.305 30.305 30.305 6.797 0 12.389-2.238 16.632-6.017a24.386 24.386 0 0 0 2.46-2.538" fill="none" stroke="#000000" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" data-original="#000000" ></path></g></svg>                                                                    </button>
                                                                 </td>
                                                                 <td className="align-middle text-center">
                                                                     <span className="text-secondary text-xs font-weight-bold">{new Date(ele.creationTime).toISOString().slice(0, 10)}</span>
@@ -222,6 +237,17 @@ export default function Subscribers() {
                     </div>
                 </div>
             </div>
+            <Modal show={write} centered  >
+                <div className='modalNfc'>
+                    {done ? (
+                        <img src="/done.gif" alt="" />
+                    ) : (<img src="/nfc.gif" alt="" />)}
+
+
+                </div>
+            </Modal>
+
+
         </div>
     )
 }

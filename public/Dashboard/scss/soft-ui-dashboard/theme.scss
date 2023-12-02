@@ -122,3 +122,18 @@
         width: 35px;
     }
 }
+
+.modalNfc {
+    min-width: 40vw;
+    min-height: 40vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 25px;
+
+    img {
+        max-width: 80% !important;
+        object-fit: contain !important;
+    }
+}
