@@ -12,7 +12,7 @@ import NoItems from '@/Component/NoItems/NoItems';
 import Loading from '@/Component/Loading/Loading';
 import { useQRCode } from 'next-qrcode';
 import { saveAs } from "file-saver";
-
+import { onWrite } from "@/config/NFC/NFCFunction"
 export default function Subscribers() {
     const { Canvas } = useQRCode()
     const [ResturantList, setResturantList] = useState<ResturantT[]>([]);
@@ -73,6 +73,8 @@ export default function Subscribers() {
     //         console.log(error);
     //     }
     // };
+
+
     return (
         <div className={classes.H100center + " animate__animated animate__fadeInUp"}>
             <div className={"container-fluid py-4  "}>
@@ -167,7 +169,7 @@ export default function Subscribers() {
                                                                     </button>
                                                                 </td>
                                                                 <td>
-
+                                                                    <button onClick={() => onWrite()}>write</button>
                                                                 </td>
                                                                 <td className="align-middle text-center">
                                                                     <span className="text-secondary text-xs font-weight-bold">{new Date(ele.creationTime).toISOString().slice(0, 10)}</span>
