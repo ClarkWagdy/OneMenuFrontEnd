@@ -10,9 +10,7 @@ const nextConfig = {
   // experimental: {
   //   appDir: true,
   // },
-  rules: {
-    "@next/next/no-img-element": "off",
-  },
+
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
@@ -29,7 +27,9 @@ const nextConfig = {
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
+
     })
+
 
     return config
   },

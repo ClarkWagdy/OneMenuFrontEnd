@@ -6,7 +6,10 @@ import { UserT } from './UserType';
 
 
 const user: string = localStorage.getItem('User') as string;
-const initialState: UserT = JSON.parse(user) as UserT;
+var initialState: UserT = {};
+if (typeof window !== 'undefined') {
+    initialState = JSON.parse(user) as UserT;
+}
 export const UserSlicer = createSlice({
     name: "User",
     initialState,
