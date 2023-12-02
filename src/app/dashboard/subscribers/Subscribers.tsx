@@ -86,7 +86,7 @@ export default function Subscribers() {
             Setdone(true);
             setTimeout(() => {
                 Setwrite(false)
-            }, 3000);
+            }, 1000);
         }
     }
     return (
