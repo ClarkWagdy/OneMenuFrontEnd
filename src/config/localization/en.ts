@@ -59,4 +59,9 @@ export const en = {
     Thisuseralreadyexists: "This user already exists",
     Dashboard: "Dashboard",
     menu: "Menu",
+    Subscribers: "Subscribers",
+    subscriptiontime: "Subscription time",
+    PlaceName: "Place name",
+    Status: "Status",
+    search: "Search",
 }

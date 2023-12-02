@@ -5,15 +5,16 @@ import React from 'react'
 import classes from './Loading.module.css'
 
 interface Props {
-  rtl?: boolean
+  rtl?: boolean,
+  Card?: boolean,
 }
 export default function Loading(props: Props) {
   const Restaurant = useAppSelector((state) => state.Restaurant);
 
   return (
-    <div className={classes.ContainLoad}>
+    <div className={props.Card ? "d-flex w-100 h-100 align-items-center justify-content-center " : classes.ContainLoad}>
 
-      <img className={classes.Logo} src={Restaurant ? `${RestaurantLogoPath}/${Restaurant.logo}` : "/wlogo.svg"} alt="" />
+      <img className={classes.Logo} src={Restaurant.logo ? `${RestaurantLogoPath}/${Restaurant.logo}` : props.Card ? "/Ologo.svg" : "/wlogo.svg"} alt="" />
     </div>
   )
 }

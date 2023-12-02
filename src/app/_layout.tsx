@@ -15,6 +15,7 @@ import { url } from '@/config/Api/url';
 import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { SetLan } from '@/config/Store/Lan/LanSlice';
+import { UserEnum } from '@/config/UserEnum/UserEnum';
 const cairo = Cairo({ subsets: ['arabic', 'latin', 'latin-ext'] });
 
 
@@ -41,29 +42,30 @@ export default function Layout({ children }: RootLayoutProps) {
       const user = localStorage.getItem('User');
       if (user) {
         let userdata = JSON.parse(user) as UserT;
+        if (userdata.type === UserEnum.Owner) {
+          dispatch(SetLoad(true));
+          axios.get(`${url}/restaurant/by-id/${userdata.RestaurantId}`)
+            .then(function (response) {
 
-        dispatch(SetLoad(true));
-        axios.get(`${url}/restaurant/by-id/${userdata.RestaurantId}`)
-          .then(function (response) {
+              if (response.status === 200) {
+                var restaurant: RestaurantT = { ...response.data.data };
+                dispatch(SetRestaurant(restaurant));
 
-            if (response.status === 200) {
-              var restaurant: RestaurantT = { ...response.data.data };
-              dispatch(SetRestaurant(restaurant));
+                dispatch(SetLan(restaurant.defaultLanguage === 0 ? Languages.AR : Languages.EN))
 
-              dispatch(SetLan(restaurant.defaultLanguage === 0 ? Languages.AR : Languages.EN))
+              }
+              dispatch(SetLoad(false));
 
-            }
-            dispatch(SetLoad(false));
-
-          })
-          .catch(function (error) {
-            // handle error
-            dispatch(SetLoad(false));
-            console.log(error);
-          })
+            })
+            .catch(function (error) {
+              // handle error
+              dispatch(SetLoad(false));
+              console.log(error);
+            })
 
 
-        dispatch(SetUser(userdata));
+          dispatch(SetUser(userdata));
+        }
       }
 
     }

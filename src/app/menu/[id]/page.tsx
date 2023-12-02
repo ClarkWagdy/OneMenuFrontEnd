@@ -32,6 +32,7 @@ import HeadTag from '@/Component/Head/HeadTag';
 export default function Page() {
   const params = useParams()
   const _Lan = useAppSelector((state) => state.Lan)
+  const dispatch = useAppDispatch();
   const [CreateOrEditcategoryModal, setCreateOrEditcategoryModal] = useState<boolean>(false);
   const [CreateOrEditItemModal, setCreateOrEditItemModal] = useState<boolean>(false);
   const [SettingModal, setSettingModal] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export default function Page() {
 
   const User = useAppSelector((state) => state.User);
   const Restaurant = useAppSelector((state) => state.Restaurant);
-  const dispatch = useAppDispatch();
+
 
 
   useEffect(() => {

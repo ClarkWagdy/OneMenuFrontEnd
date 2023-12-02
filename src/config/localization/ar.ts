@@ -59,5 +59,10 @@ export const ar = {
     Thisuseralreadyexists: "هذا المستخدم موجود مسبقا",
     Dashboard: "لوحة التحكم",
     menu: "قائمة طعام",
+    Subscribers: "المشتركين",
+    subscriptiontime: "وقت الاشتراك",
+    PlaceName: "اسم المكان",
+    Status: "الحالة",
+    search: "بحث",
 
 }

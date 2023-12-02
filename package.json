@@ -14,19 +14,23 @@
     "@nextui-org/system": "^2.0.15",
     "@nextui-org/theme": "^2.1.17",
     "@reduxjs/toolkit": "^1.9.5",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "18.11.19",
     "@types/react": "18",
     "@types/react-dom": "18",
     "animate.css": "^4.1.1",
     "axios": "^1.5.1",
     "bootstrap": "^5.3.0",
+    "chart.js": "^4.4.0",
     "dnd-core": "^16.0.1",
     "eslint": "8.33.0",
     "eslint-config-next": "13.1.6",
+    "file-saver": "^2.0.5",
     "formik": "^2.4.2",
     "framer-motion": "^10.16.4",
     "immutability-helper": "^3.1.1",
     "next": "^13.5.6",
+    "next-qrcode": "^2.5.1",
     "rdndmb-html5-to-touch": "^8.0.1",
     "react": "18",
     "react-beautiful-dnd": "^13.1.1",
@@ -49,11 +53,10 @@
     "typescript": "4.9.5",
     "yup": "^1.2.0"
   },
-  "resolutions": { 
+  "resolutions": {
     "@types/react": "18",
-     "@types/react-dom": "18" },
-
-
+    "@types/react-dom": "18"
+  },
   "devDependencies": {
     "@svgr/webpack": "^8.0.1",
     "@types/react-beautiful-dnd": "^13.1.4",
