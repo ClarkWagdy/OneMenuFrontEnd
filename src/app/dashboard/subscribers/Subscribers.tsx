@@ -86,7 +86,7 @@ export default function Subscribers() {
             Setdone(true);
             setTimeout(() => {
                 Setwrite(false)
-            }, 500);
+            }, 3000);
         }
     }
     return (
@@ -163,7 +163,7 @@ export default function Subscribers() {
                                                                 </td>
                                                                 <td id={ele.id} className='  qr d-flex align-items-center justify-content-center'>
                                                                     <Canvas
-                                                                        text={`${window.location.href}/menu/${ele.id}`}
+                                                                        text={`${window.location.host}/menu/${ele.id}`}
                                                                         options={{
                                                                             type: 'image/jpeg',
 
@@ -183,7 +183,7 @@ export default function Subscribers() {
                                                                     </button>
                                                                 </td>
                                                                 <td className='text-center'>
-                                                                    <button className='btn p-0 m-0 p-2' onClick={() => Handlewrite(`${window.location.href}/menu/${ele.id}`)}>
+                                                                    <button className='btn p-0 m-0 p-2' onClick={() => Handlewrite(`${window.location.host}/menu/${ele.id}`)}>
                                                                         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 512 512" ><g><path d="M504.5 316.61H310.55M504.5 346.91H310.55M390.02 124.68h-79.47M355.02 387.32h-44.47M425.02 124.68h59.28c11.16 0 20.2 9.04 20.2 20.2v222.24c0 11.16-9.04 20.2-20.2 20.2h-94.28M383.28 175.187h20.204M433.789 165.085l-20.204 60.61M464.094 215.593H443.89M7.5 142.18v321.91c0 22.32 18.09 40.41 40.41 40.41h222.23c22.32 0 40.41-18.09 40.41-40.41V47.91c0-22.32-18.09-40.41-40.41-40.41H47.91C25.59 7.5 7.5 25.59 7.5 47.91v59.27M138.821 37.805h40.407" fill="none" stroke="#000000" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" data-original="#000000" ></path><path d="M103.465 147.022c61.271 0 111.118 49.847 111.118 111.118" fill="none" stroke="#000000" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" data-original="#000000" ></path><path d="M103.465 177.327c44.561 0 80.813 36.252 80.813 80.813M103.465 207.631c27.851 0 50.508 22.658 50.508 50.508M103.465 237.936c11.158 0 20.203 9.045 20.203 20.203M73.533 364.978v-60.496l42.472 60.496v-60.609M170.875 304.369H146.31v60.609M146.31 334.099h22.614M242.368 309.544a30.161 30.161 0 0 0-16.944-5.176c-16.737 0-30.305 13.568-30.305 30.305 0 16.737 13.568 30.305 30.305 30.305 6.797 0 12.389-2.238 16.632-6.017a24.386 24.386 0 0 0 2.46-2.538" fill="none" stroke="#000000" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" data-original="#000000" ></path></g></svg>                                                                    </button>
                                                                 </td>
                                                                 <td className="align-middle text-center">
