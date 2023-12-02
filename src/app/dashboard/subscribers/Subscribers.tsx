@@ -199,31 +199,7 @@ export default function Subscribers() {
                                                     })}
 
 
-                                                    <tr>
-                                                        <td>
-                                                            <div className="d-flex px-2 py-1">
-                                                                <div>
-                                                                    <img src="../assets/img/team-3.jpg" className="avatar avatar-sm me-3" alt="user2" />
-                                                                </div>
-                                                                <div className="d-flex flex-column justify-content-center">
-                                                                    <h6 className="mb-0 text-sm">Alexa Liras</h6>
-                                                                    <p className="text-xs text-secondary mb-0">alexa@creative-tim.com</p>
-                                                                </div>
-                                                            </div>
-                                                        </td>
 
-                                                        <td className="align-middle text-center text-sm">
-                                                            <span className="badge badge-sm bg-gradient-secondary">Offline</span>
-                                                        </td>
-                                                        <td className="align-middle text-center">
-                                                            <span className="text-secondary text-xs font-weight-bold">11/01/19</span>
-                                                        </td>
-                                                        <td className="align-middle">
-                                                            <a href="/" className="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                                                                Edit
-                                                            </a>
-                                                        </td>
-                                                    </tr>
 
                                                 </tbody>
                                             </table>
