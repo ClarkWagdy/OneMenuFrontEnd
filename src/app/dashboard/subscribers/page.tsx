@@ -40,7 +40,7 @@ export default function Subscribers() {
     }
 
     function HandleDownload(name: string, id: string) {
-        const canva = document.getElementsByTagName("canvas")[0];
+        const canva = document?.getElementsByTagName("canvas")[0];
         canva.toBlob((blob: any) => {
             saveAs(blob, `${name}.png`);
         });

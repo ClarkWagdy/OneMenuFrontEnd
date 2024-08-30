@@ -33,7 +33,7 @@ export default function Sidebar(props: Props) {
         })
             .then(function (response) {
                 if (response.status === 200) {
-                    var messagesNumber: any = document.getElementById('messagesNumber');
+                    var messagesNumber: any = document?.getElementById('messagesNumber');
 
                     if (response.data.data > 0) {
                         messagesNumber.innerHTML = `<span  class=${classes.Messagenum}> ${response.data.data}   </span>`;

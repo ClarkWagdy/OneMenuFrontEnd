@@ -31,7 +31,7 @@
         },
         scale: 1,
         cleanup: false,
-        container: document.documentElement,
+        container: document?.documentElement,
         desktop: true,
         mobile: true,
         reset: false,
@@ -50,7 +50,7 @@
     };
 
     function failure() {
-        document.documentElement.classList.remove('sr');
+        document?.documentElement.classList.remove('sr');
 
         return {
             clean: function clean() { },
@@ -64,13 +64,13 @@
     }
 
     function success() {
-        document.documentElement.classList.add('sr');
+        document?.documentElement.classList.add('sr');
 
-        if (document.body) {
-            document.body.style.height = '100%';
+        if (document?.body) {
+            document?.body.style.height = '100%';
         } else {
-            document.addEventListener('DOMContentLoaded', function () {
-                document.body.style.height = '100%';
+            document?.addEventListener('DOMContentLoaded', function () {
+                document?.body.style.height = '100%';
             });
         }
     }
@@ -520,7 +520,7 @@
 
     var getPrefixedCssProp = (function () {
         var properties = {};
-        var style = document.documentElement.style;
+        var style = document?.documentElement.style;
 
         function getPrefixedCssProperty(name, source) {
             if (source === void 0) source = style;
@@ -820,7 +820,7 @@
          */
         each(this.store.containers, function (container) {
             var target =
-                container.node === document.documentElement ? window : container.node;
+                container.node === document?.documentElement ? window : container.node;
             target.removeEventListener('scroll', this$1.delegate);
             target.removeEventListener('resize', this$1.delegate);
         });
@@ -893,7 +893,7 @@
 
         each(this.store.containers, function (container) {
             var target =
-                container.node === document.documentElement ? window : container.node;
+                container.node === document?.documentElement ? window : container.node;
             target.addEventListener('scroll', this$1.delegate);
             target.addEventListener('resize', this$1.delegate);
         });
@@ -1361,7 +1361,7 @@
 
     function getScrolled(container) {
         var top, left;
-        if (container.node === document.documentElement) {
+        if (container.node === document?.documentElement) {
             top = window.pageYOffset;
             left = window.pageXOffset;
         } else {
@@ -1455,12 +1455,12 @@
     }
 
     function isTransformSupported() {
-        var style = document.documentElement.style;
+        var style = document?.documentElement.style;
         return 'transform' in style || 'WebkitTransform' in style
     }
 
     function isTransitionSupported() {
-        var style = document.documentElement.style;
+        var style = document?.documentElement.style;
         return 'transition' in style || 'WebkitTransition' in style
     }
 

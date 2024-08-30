@@ -18,23 +18,23 @@
 
   if (isWindows) {
     // if we are on windows OS we activate the perfectScrollbar function
-    if (document.getElementsByClassName('main-content')[0]) {
-      var mainpanel = document.querySelector('.main-content');
+    if (document?.getElementsByClassName('main-content')[0]) {
+      var mainpanel = document?.querySelector('.main-content');
       var ps = new PerfectScrollbar(mainpanel);
     };
 
-    if (document.getElementsByClassName('sidenav')[0]) {
-      var sidebar = document.querySelector('.sidenav');
+    if (document?.getElementsByClassName('sidenav')[0]) {
+      var sidebar = document?.querySelector('.sidenav');
       var ps1 = new PerfectScrollbar(sidebar);
     };
 
-    if (document.getElementsByClassName('navbar-collapse')[0]) {
-      var fixedplugin = document.querySelector('.navbar:not(.navbar-expand-lg) .navbar-collapse');
+    if (document?.getElementsByClassName('navbar-collapse')[0]) {
+      var fixedplugin = document?.querySelector('.navbar:not(.navbar-expand-lg) .navbar-collapse');
       var ps2 = new PerfectScrollbar(fixedplugin);
     };
 
-    if (document.getElementsByClassName('fixed-plugin')[0]) {
-      var fixedplugin = document.querySelector('.fixed-plugin');
+    if (document?.getElementsByClassName('fixed-plugin')[0]) {
+      var fixedplugin = document?.querySelector('.fixed-plugin');
       var ps3 = new PerfectScrollbar(fixedplugin);
     };
   };
@@ -45,21 +45,21 @@ navbarBlurOnScroll('navbarBlur');
 
 
 // initialization of Tooltips
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipTriggerList = [].slice.call(document?.querySelectorAll('[data-bs-toggle="tooltip"]'))
 var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
   return new bootstrap.Tooltip(tooltipTriggerEl)
 })
 
 // Fixed Plugin
 
-if (document.querySelector('.fixed-plugin')) {
-  var fixedPlugin = document.querySelector('.fixed-plugin');
-  var fixedPluginButton = document.querySelector('.fixed-plugin-button');
-  var fixedPluginButtonNav = document.querySelector('.fixed-plugin-button-nav');
-  var fixedPluginCard = document.querySelector('.fixed-plugin .card');
-  var fixedPluginCloseButton = document.querySelectorAll('.fixed-plugin-close-button');
-  var navbar = document.getElementById('navbarBlur');
-  var buttonNavbarFixed = document.getElementById('navbarFixed');
+if (document?.querySelector('.fixed-plugin')) {
+  var fixedPlugin = document?.querySelector('.fixed-plugin');
+  var fixedPluginButton = document?.querySelector('.fixed-plugin-button');
+  var fixedPluginButtonNav = document?.querySelector('.fixed-plugin-button-nav');
+  var fixedPluginCard = document?.querySelector('.fixed-plugin .card');
+  var fixedPluginCloseButton = document?.querySelectorAll('.fixed-plugin-close-button');
+  var navbar = document?.getElementById('navbarBlur');
+  var buttonNavbarFixed = document?.getElementById('navbarFixed');
 
   if (fixedPluginButton) {
     fixedPluginButton.onclick = function() {
@@ -87,7 +87,7 @@ if (document.querySelector('.fixed-plugin')) {
     }
   })
 
-  document.querySelector('body').onclick = function(e) {
+  document?.querySelector('body').onclick = function(e) {
     if (e.target != fixedPluginButton && e.target != fixedPluginButtonNav && e.target.closest('.fixed-plugin .card') != fixedPluginCard) {
       fixedPlugin.classList.remove('show');
     }
@@ -103,10 +103,10 @@ if (document.querySelector('.fixed-plugin')) {
 
 // Tabs navigation
 
-var total = document.querySelectorAll('.nav-pills');
+var total = document?.querySelectorAll('.nav-pills');
 
 total.forEach(function(item, i) {
-  var moving_div = document.createElement('div');
+  var moving_div = document?.createElement('div');
   var first_li = item.querySelector('li:first-child .nav-link');
   var tab = first_li.cloneNode();
   tab.innerHTML = "-";
@@ -155,7 +155,7 @@ total.forEach(function(item, i) {
 window.addEventListener('resize', function(event) {
   total.forEach(function(item, i) {
     item.querySelector('.moving-tab').remove();
-    var moving_div = document.createElement('div');
+    var moving_div = document?.createElement('div');
     var tab = item.querySelector(".nav-link.active").cloneNode();
     tab.innerHTML = "-";
 
@@ -231,16 +231,16 @@ function sidebarColor(a) {
     a.classList.remove('active');
   }
 
-  var sidebar = document.querySelector('.sidenav');
+  var sidebar = document?.querySelector('.sidenav');
   sidebar.setAttribute("data-color", color);
 
-  if (document.querySelector('#sidenavCard')) {
-    var sidenavCard = document.querySelector('#sidenavCard');
+  if (document?.querySelector('#sidenavCard')) {
+    var sidenavCard = document?.querySelector('#sidenavCard');
     let sidenavCardClasses = ['card', 'card-background', 'shadow-none', 'card-background-mask-' + color];
     sidenavCard.className = '';
     sidenavCard.classList.add(...sidenavCardClasses);
 
-    var sidenavCardIcon = document.querySelector('#sidenavCardIcon');
+    var sidenavCardIcon = document?.querySelector('#sidenavCardIcon');
     let sidenavCardIconClasses = ['ni', 'ni-diamond', 'text-gradient', 'text-lg', 'top-0', 'text-' + color];
     sidenavCardIcon.className = '';
     sidenavCardIcon.classList.add(...sidenavCardIconClasses);
@@ -251,7 +251,7 @@ function sidebarColor(a) {
 // Set Navbar Fixed
 function navbarFixed(el) {
   let classes = ['position-sticky', 'blur', 'shadow-blur', 'mt-4', 'left-auto', 'top-1', 'z-index-sticky'];
-  const navbar = document.getElementById('navbarBlur');
+  const navbar = document?.getElementById('navbarBlur');
 
   if (!el.getAttribute("checked")) {
     navbar.classList.add(...classes);
@@ -269,7 +269,7 @@ function navbarFixed(el) {
 // Navbar blur on scroll
 
 function navbarBlurOnScroll(id) {
-  const navbar = document.getElementById(id);
+  const navbar = document?.getElementById(id);
   let navbarScrollActive = navbar ? navbar.getAttribute("navbar-scroll") : false;
   let scrollDistance = 5;
   let classes = ['position-sticky', 'blur', 'shadow-blur', 'mt-4', 'left-auto', 'top-1', 'z-index-sticky'];
@@ -306,8 +306,8 @@ function navbarBlurOnScroll(id) {
   }
 
   function toggleNavLinksColor(type) {
-    let navLinks = document.querySelectorAll('.navbar-main .nav-link')
-    let navLinksToggler = document.querySelectorAll('.navbar-main .sidenav-toggler-line')
+    let navLinks = document?.querySelectorAll('.navbar-main .nav-link')
+    let navLinksToggler = document?.querySelectorAll('.navbar-main .sidenav-toggler-line')
 
     if (type === "blur") {
       navLinks.forEach(element => {
@@ -369,7 +369,7 @@ function sidebarType(a) {
     a.classList.remove('active');
   }
 
-  var sidebar = document.querySelector('.sidenav');
+  var sidebar = document?.querySelector('.sidenav');
 
   for (var i = 0; i < colors.length; i++) {
     sidebar.classList.remove(colors[i]);
@@ -380,10 +380,10 @@ function sidebarType(a) {
 
 
 // Toggle Sidenav
-const iconNavbarSidenav = document.getElementById('iconNavbarSidenav');
-const iconSidenav = document.getElementById('iconSidenav');
-const sidenav = document.getElementById('sidenav-main');
-let body = document.getElementsByTagName('body')[0];
+const iconNavbarSidenav = document?.getElementById('iconNavbarSidenav');
+const iconSidenav = document?.getElementById('iconSidenav');
+const sidenav = document?.getElementById('sidenav-main');
+let body = document?.getElementsByTagName('body')[0];
 let className = 'g-sidenav-pinned';
 
 if (iconNavbarSidenav) {
@@ -412,7 +412,7 @@ function toggleSidenav() {
 
 // Resize navbar color depends on configurator active type of sidenav
 
-let referenceButtons = document.querySelector('[data-class]');
+let referenceButtons = document?.querySelector('[data-class]');
 
 window.addEventListener("resize", navbarColorOnResize);
 
@@ -434,7 +434,7 @@ window.addEventListener("resize", sidenavTypeOnResize);
 window.addEventListener("load", sidenavTypeOnResize);
 
 function sidenavTypeOnResize() {
-  let elements = document.querySelectorAll('[onclick="sidebarType(this)"]');
+  let elements = document?.querySelectorAll('[onclick="sidebarType(this)"]');
   if (window.innerWidth < 1200) {
     elements.forEach(function(el) {
       el.classList.add('disabled');
