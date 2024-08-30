@@ -1174,7 +1174,7 @@ export default function HomePage() {
                       </a>
                     </li> */}
                     <li>
-                      <a href={linkedin} target="_blank">
+                      <a href={linkedin} target="_blank" rel="noreferrer">
                         <span className="screen-reader-text">Linkedin</span>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
