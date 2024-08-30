@@ -1,5 +1,6 @@
 export function toggleSidenav() {
-    const iconSidenav = document?.getElementById('iconSidenav');
+    if (typeof document !== "undefined"){
+      const iconSidenav = document?.getElementById("iconSidenav");
 
     if (window.innerWidth < 1200) {
         if (document?.getElementById('sidenavBody')?.classList.contains('g-sidenav-pinned')) {
@@ -16,4 +17,5 @@ export function toggleSidenav() {
             iconSidenav?.classList.remove('d-none');
         }
     }
+}
 }
