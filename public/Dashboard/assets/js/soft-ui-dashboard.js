@@ -12,6 +12,8 @@
 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
+
+window.onload = function() {
 "use strict";
 (function() {
   var isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
@@ -444,4 +446,4 @@ function sidenavTypeOnResize() {
       el.classList.remove('disabled');
     });
   }
-}
+}}

@@ -2,7 +2,7 @@
 import anime from "animejs/lib/anime.es.js"
 import ScrollReveal from './scrollreveal'
 export function animeFun() {
-
+window.onload = function() {
     const e = document.documentElement;
     if (e.classList.remove("no-js"), e.classList.add("js"), document.getElementById('HomePage').classList.contains("has-animations")) {
         (window.sr = ScrollReveal()).reveal(".feature, .testimonial", {
@@ -53,5 +53,5 @@ export function animeFun() {
         }
         ), e.classList.add("anime-ready"), a.play()
     }
-
+}
 }
