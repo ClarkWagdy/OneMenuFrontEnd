@@ -12,7 +12,7 @@ import Loading from '@/Component/Loading/Loading';
 import Modal from 'react-bootstrap/Modal';
 import Moment from 'react-moment';
 import 'moment/locale/ar';
-import 'bootstrap/dist/js/bootstrap.js';
+// import 'bootstrap/dist/js/bootstrap.js';
 import { Languages } from '@/config/localization/Languages';
 import Swal from 'sweetalert2';
 
