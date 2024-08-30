@@ -7,6 +7,7 @@ import { LoadReducer } from './Load/LoadSlice'
 import { RestaurantReducer } from './Restaurant/RestaurantSlice'
 import { RestaurantT } from './Restaurant/RestaurantType'
 import { DashboardPagesReducer } from './DashboardPages/DashboardPagesSlice'
+import { NonReadReducer } from './NonRead/NonRead'
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
     User: UserReducer,
     Load: LoadReducer,
     Restaurant: RestaurantReducer,
-    DashboardPage: DashboardPagesReducer
+    DashboardPage: DashboardPagesReducer,
+    NonRead: NonReadReducer,
 
 
   },

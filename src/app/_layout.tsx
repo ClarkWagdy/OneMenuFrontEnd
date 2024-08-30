@@ -83,12 +83,8 @@ export default function Layout({ children }: RootLayoutProps) {
           {Load ? (
             <Loading rtl={strings.getLanguage() === Languages.AR ? true : false} />
           ) : (<>
-
             {children}
-
           </>)}
-
-
         </main>
       </body>
     </html>

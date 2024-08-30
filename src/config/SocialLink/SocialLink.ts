@@ -1,0 +1,1 @@
+export const linkedin = "https://www.linkedin.com/company/solu-one";

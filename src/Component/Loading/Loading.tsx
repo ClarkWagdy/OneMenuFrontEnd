@@ -14,7 +14,7 @@ export default function Loading(props: Props) {
   return (
     <div className={props.Card ? "d-flex w-100 h-100 align-items-center justify-content-center " : classes.ContainLoad}>
 
-      <img className={classes.Logo} src={Restaurant.logo ? `${RestaurantLogoPath}/${Restaurant.logo}` : props.Card ? "/Ologo.svg" : "/wlogo.svg"} alt="" />
+      <img className={classes.Logo} src={Restaurant.logo ? `${RestaurantLogoPath}/${Restaurant.logo}` : props.Card ? "/Ologo.svg" : "/Ologo.svg"} alt="" />
     </div>
   )
 }

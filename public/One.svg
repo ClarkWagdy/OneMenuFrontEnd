@@ -4,7 +4,7 @@
       .cls-1 {
         fill: #3f3f3f;
         stroke: #3f3f3f;
-        stroke-width: 1px;
+        strokeWidth: 1px;
       }
 
       .cls-1, .cls-2 {

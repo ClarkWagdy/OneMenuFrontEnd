@@ -3,13 +3,65 @@ import { Languages } from '@/config/localization/Languages'
 import { strings } from '@/config/localization/LocalizedStrings'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import classes from './Dashboard.module.scss';
+import axios from 'axios'
+import { url } from '@/config/Api/url'
+import { useAppSelector } from '@/config/Store/hooks'
+import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut'
+import { Interval } from '@/config/Intervaltime/Intervaltime'
+import '/public/Dashboard/css/nucleo-icons.css'
+import '/public/Dashboard/css/nucleo-svg.css'
+import '/public/Dashboard/css/nucleo-svg.css'
+import '/public/Dashboard/scss/soft-ui-dashboard.scss';
 interface Props {
     toggleSidenav: Function,
-    PageChange: Function,
+    PageChange?: Function,
     CurrentPage: number,
 }
 export default function Sidebar(props: Props) {
+
+    const User = useAppSelector((state) => state.User);
+    const NonRead = useAppSelector((state) => state.NonRead);
+
+    const handleGetnunreadnum = useCallback(() => {
+
+        axios.get(`${url}/connect-us/nun-read-num`, {
+            headers: {
+                'Authorization': User.token
+            }
+        })
+            .then(function (response) {
+                if (response.status === 200) {
+                    var messagesNumber: any = document.getElementById('messagesNumber');
+
+                    if (response.data.data > 0) {
+                        messagesNumber.innerHTML = `<span  class=${classes.Messagenum}> ${response.data.data}   </span>`;
+
+                    } else {
+                        messagesNumber.innerHTML = "";
+                    }
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error)
+                if (error.request.status) {
+                    HandleLogOut();
+                }
+            })
+    }, [props.CurrentPage]);
+
+    const Intervaldata = setInterval(() => {
+        handleGetnunreadnum()
+    }, Interval)
+
+    useEffect(() => {
+        handleGetnunreadnum();
+        return () => {
+            clearInterval(Intervaldata);
+        }
+    }, [NonRead])
     return (
         <aside className={`sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 m-s-3  ${strings.getLanguage() === Languages.AR ? " fixed-end  " : " fixed-start "}`} id="sidenav-main">
             <div className="sidenav-header d-flex align-items-center ">
@@ -24,7 +76,7 @@ export default function Sidebar(props: Props) {
             <div className="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <button className={`nav-link ${props.CurrentPage === DashboardPages.Home ? " active " : ""} `} onClick={() => props.PageChange(DashboardPages.Home)}>
+                        <Link href="/dashboard" className={`nav-link ${props.CurrentPage === DashboardPages.Home ? " active " : ""} `} >
                             <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center mee-2 d-flex align-items-center justify-content-center">
                                 <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" >
                                     <title>{strings.Dashboard} </title>
@@ -41,10 +93,10 @@ export default function Sidebar(props: Props) {
                                 </svg>
                             </div>
                             <span className="nav-link-text mss-1">{strings.Dashboard}</span>
-                        </button>
+                        </Link>
                     </li>
                     <li className="nav-item">
-                        <button className={`nav-link ${props.CurrentPage === DashboardPages.Subscribers ? " active " : ""} `} onClick={() => props.PageChange(DashboardPages.Subscribers)}>
+                        <Link href="/dashboard/subscribers" className={`nav-link ${props.CurrentPage === DashboardPages.Subscribers ? " active " : ""} `} >
                             <div className="icon icon-shape icon-sm shadow border-radius-md bg-white text-center mee-2 d-flex align-items-center justify-content-center">
                                 <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
                                     <title>{strings.Subscribers}</title>
@@ -61,7 +113,38 @@ export default function Sidebar(props: Props) {
                                 </svg>
                             </div>
                             <span className="nav-link-text mss-1">{strings.Subscribers}</span>
-                        </button>
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link href="/dashboard/connectus" className={`nav-link ${props.CurrentPage === DashboardPages.ConnectUs ? " active " : ""} `} >
+                            <div className={"icon icon-shape icon-sm shadow border-radius-md bg-white text-center mee-2 d-flex align-items-center justify-content-center " + classes.MEssagenav}>
+
+                                <span id='messagesNumber'>
+
+                                </span>
+                                <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                >
+
+                                    <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                                        <g transform="translate(-1870.000000, -591.000000)" fill="#FFFFFF" fillRule="nonzero">
+                                            <g transform="translate(1716.000000, 291.000000)">
+                                                <g transform="translate(154.000000, 300.000000)">
+                                                    <path className="color-background opacity-6"
+                                                        d="M40,40 L36.3636364,40 L36.3636364,3.63636364 L5.45454545,3.63636364 L5.45454545,0 L38.1818182,0 C39.1854545,0 40,0.814545455 40,1.81818182 L40,40 Z">
+                                                    </path>
+                                                    <path className="color-background"
+                                                        d="M30.9090909,7.27272727 L1.81818182,7.27272727 C0.814545455,7.27272727 0,8.08727273 0,9.09090909 L0,41.8181818 C0,42.8218182 0.814545455,43.6363636 1.81818182,43.6363636 L30.9090909,43.6363636 C31.9127273,43.6363636 32.7272727,42.8218182 32.7272727,41.8181818 L32.7272727,9.09090909 C32.7272727,8.08727273 31.9127273,7.27272727 30.9090909,7.27272727 Z M18.1818182,34.5454545 L7.27272727,34.5454545 L7.27272727,30.9090909 L18.1818182,30.9090909 L18.1818182,34.5454545 Z M25.4545455,27.2727273 L7.27272727,27.2727273 L7.27272727,23.6363636 L25.4545455,23.6363636 L25.4545455,27.2727273 Z M25.4545455,20 L7.27272727,20 L7.27272727,16.3636364 L25.4545455,16.3636364 L25.4545455,20 Z">
+                                                    </path>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </svg>
+
+
+                            </div>
+                            <span className="nav-link-text mss-1">{strings.Message}</span>
+                        </Link>
                     </li>
                     <li className="nav-item">
                         <a className="nav-link  " href="../pages/billing.html">

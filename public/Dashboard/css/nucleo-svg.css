@@ -110,19 +110,19 @@ Stroke effects - Nucleo outline icons
 -------------------------------- */
 
 .icon-outline.icon-stroke-1 {
-  stroke-width: 1px;
+  strokeWidth: 1px;
 }
 
 .icon-outline.icon-stroke-2 {
-  stroke-width: 2px;
+  strokeWidth: 2px;
 }
 
 .icon-outline.icon-stroke-3 {
-  stroke-width: 3px;
+  strokeWidth: 3px;
 }
 
 .icon-outline.icon-stroke-4 {
-  stroke-width: 4px;
+  strokeWidth: 4px;
 }
 
 .icon-outline.icon-stroke-1 use,

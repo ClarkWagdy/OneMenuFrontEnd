@@ -1,0 +1,1 @@
+export const Interval = 1000 * 60;

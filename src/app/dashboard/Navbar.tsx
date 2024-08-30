@@ -5,8 +5,12 @@ import { strings } from '@/config/localization/LocalizedStrings';
 import { useAppDispatch, useAppSelector } from '@/config/Store/hooks';
 import { SetLan } from '@/config/Store/Lan/LanSlice';
 import React from 'react'
-
+import '/public/Dashboard/css/nucleo-icons.css'
+import '/public/Dashboard/css/nucleo-svg.css'
+import '/public/Dashboard/css/nucleo-svg.css'
+import '/public/Dashboard/scss/soft-ui-dashboard.scss';
 import classes from './Dashboard.module.scss'
+
 interface Props {
     toggleSidenav: Function,
     CurrentPage: number,

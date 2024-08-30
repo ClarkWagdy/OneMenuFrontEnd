@@ -1,23 +1,26 @@
-.ContainLoad{
+.ContainLoad {
     height: 100vh;
     width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgb(63, 63, 63);
+    background-color: white;
 }
-.Logo{
+
+.Logo {
     width: 150px;
     object-fit: cover;
     animation: 750ms infinite alternate LogoAnimation;
 }
+
 @keyframes LogoAnimation {
     from {
-        opacity:1;
+        opacity: 1;
         transform: scale(1);
     }
+
     to {
-        opacity:0.3;
+        opacity: 0.3;
         transform: scale(0.9);
     }
-  }
+}

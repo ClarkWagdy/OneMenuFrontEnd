@@ -1,4 +1,5 @@
 @include media-breakpoint-up(lg) {
+
   .dropdown,
   .dropup,
   .dropstart,
@@ -9,59 +10,64 @@
     }
 
     .dropdown-toggle {
+
       &:after,
-      &:before{
+      &:before {
         font: normal normal normal 14px/1 FontAwesome;
         border: none;
         vertical-align: middle;
         font-weight: $font-weight-bold;
       }
-      &.show{
+
+      &.show {
+
         &:after,
-        &:before{
+        &:before {
           transform: $dropdown-toggle-arrow-transform;
         }
       }
+
       &:after,
-      &:before{
-         transition: $dropdown-toggle-arrow-transition;
+      &:before {
+        transition: $dropdown-toggle-arrow-transition;
       }
     }
   }
 
   .dropdown,
-  .dropup{
-    .dropdown-menu{
+  .dropup {
+    .dropdown-menu {
       transition: $dropdown-transition;
     }
 
     .dropdown-toggle {
-      &:after{
+      &:after {
         content: "\f107";
       }
     }
   }
 
-  .dropstart{
+  .dropstart {
     .dropdown-toggle {
-      &:before{
+      &:before {
         content: "\f104";
       }
     }
   }
 
-  .dropend{
+  .dropend {
     .dropdown-toggle {
-      &:after{
+      &:after {
         content: "\f105";
       }
     }
   }
 
   .dropdown {
+
     &.dropdown-hover .dropdown-menu,
     .dropdown-menu {
-      display: block;
+
       opacity: 0;
       top: 0;
       transform-origin: $dropdown-transform-origin;
@@ -69,10 +75,10 @@
       transform: $dropdown-transform;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
-      will-change: transform,box-shadow;
+      will-change: transform, box-shadow;
     }
 
-    &.dropdown-hover:hover > .dropdown-menu,
+    &.dropdown-hover:hover>.dropdown-menu,
     .dropdown-menu.show {
       opacity: 1;
       pointer-events: auto;
@@ -80,7 +86,7 @@
       transform: $dropdown-transform-show;
     }
 
-    &.dropdown-hover:hover > .dropdown-menu:before,
+    &.dropdown-hover:hover>.dropdown-menu:before,
     .dropdown-menu.show:before {
       top: $dropdown-hover-arrow-active-top;
     }
@@ -125,10 +131,9 @@
 }
 
 @include media-breakpoint-down(lg) {
-  .navbar-toggler + .navbar-collapse {
+  .navbar-toggler+.navbar-collapse {
     .dropdown:not(.nav-item) {
       .dropdown-menu {
-        display: block;
         opacity: 0;
         top: 0;
         transform-origin: $dropdown-transform-origin;
@@ -137,7 +142,7 @@
         transition: $dropdown-transition;
         -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
-        will-change: transform,box-shadow;
+        will-change: transform, box-shadow;
         box-shadow: $dropdown-box-shadow;
 
         &:before {
@@ -168,6 +173,7 @@
         }
       }
     }
+
     .dropdown.nav-item .dropdown-menu {
       background-color: transparent;
       overflow: scroll;
@@ -187,7 +193,7 @@
       transition: $dropdown-transition;
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
-      will-change: transform,box-shadow;
+      will-change: transform, box-shadow;
       box-shadow: $dropdown-box-shadow;
 
       &:before {
@@ -202,6 +208,7 @@
         transition: $dropdown-animation-arrow-transition;
       }
     }
+
     &:not(.dropdown-hover) .dropdown-menu {
       margin-top: $dropdown-mt !important;
     }
@@ -244,7 +251,7 @@
       .dropdown-menu.show {
         transform: $dropdown-transform-responsive-show;
         box-shadow: none;
-        margin-bottom: 1rem;  
+        margin-bottom: 1rem;
       }
     }
   }
@@ -264,29 +271,31 @@
   }
 
   .dropdown-menu {
-    .dropdown-item + .dropdown-menu:before {
+    .dropdown-item+.dropdown-menu:before {
       transform: $dropdown-subitem-arrow-rotate;
       left: 0;
       top: 0;
       z-index: -1;
       transition: left .35s ease;
     }
-    &.dropdown-menu-end{
+
+    &.dropdown-menu-end {
       right: 0 !important;
       left: auto !important;
-      &:before{
+
+      &:before {
         right: $dropdown-animation-arrow-left-position;
         left: auto;
       }
     }
   }
 
-  &.dropdown-subitem:hover .dropdown-item + .dropdown-menu:before {
+  &.dropdown-subitem:hover .dropdown-item+.dropdown-menu:before {
     left: $dropdown-subitem-left-hover;
   }
 
-  & > .dropdown-menu {
-    .dropdown-item + .dropdown-menu {
+  &>.dropdown-menu {
+    .dropdown-item+.dropdown-menu {
       transform: $dropdown-multilevel-transform-show;
     }
   }
@@ -297,6 +306,7 @@
   left: auto;
   top: 0;
 }
+
 // End MultiLevel Dropdown Style
 
 .dropdown-image {
@@ -318,7 +328,7 @@
 }
 
 @include media-breakpoint-down(xl) {
- .dropdown-lg-responsive {
-   min-width: $dropdown-lg-width-responsive;
- }
+  .dropdown-lg-responsive {
+    min-width: $dropdown-lg-width-responsive;
+  }
 }
