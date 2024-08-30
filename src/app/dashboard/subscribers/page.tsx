@@ -40,10 +40,13 @@ export default function Subscribers() {
     }
 
     function HandleDownload(name: string, id: string) {
-        const canva = document?.getElementsByTagName("canvas")[0];
-        canva.toBlob((blob: any) => {
-            saveAs(blob, `${name}.png`);
-        });
+        if (typeof document !== "undefined")
+       {
+           const canva = document.getElementsByTagName("canvas")[0];
+           canva.toBlob((blob: any) => {
+             saveAs(blob, `${name}.png`);
+           });
+       }
     }
     useEffect(() => {
         axios.get(`${url}/restaurant?${Name ? `Name=${Name}&` : ""}Count=${Count}&PageNumber=${PageNumber}`, {

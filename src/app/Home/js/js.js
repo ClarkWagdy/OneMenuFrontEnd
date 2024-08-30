@@ -3,8 +3,9 @@ import anime from "animejs/lib/anime.es.js"
 import ScrollReveal from './scrollreveal'
 export function animeFun() {
 
-    const e = document?.documentElement;
-    if (e.classList.remove("no-js"), e.classList.add("js"), document?.getElementById('HomePage').classList.contains("has-animations")) {
+if (typeof document !== "undefined"){
+    const e = document.documentElement;
+    if (e.classList.remove("no-js"), e.classList.add("js"), document.getElementById('HomePage').classList.contains("has-animations")) {
         (window.sr = ScrollReveal()).reveal(".feature, .testimonial", {
             reset: true,
             duration: 600, distance: "50px", easing: "cubic-bezier(0.5, -0.01, 0, 1.005)", origin: "bottom", interval: 100
@@ -15,7 +16,7 @@ export function animeFun() {
         const a = anime.timeline({
             autoplay: !1
         }
-        ), t = document?.querySelector(".stroke-animation");
+        ), t = document.querySelector(".stroke-animation");
         t.setAttribute("stroke-dashoffset", anime.setDashoffset(t)), a.add({
             targets: ".stroke-animation", strokeDashoffset: {
                 value: 0, duration: 2e3, easing: "easeInOutQuart"
@@ -53,5 +54,5 @@ export function animeFun() {
         }
         ), e.classList.add("anime-ready"), a.play()
     }
-
+}
 }
