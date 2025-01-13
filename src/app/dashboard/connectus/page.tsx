@@ -23,9 +23,10 @@ import HeadTag from '@/Component/Head/HeadTag';
 import Sidebar from '../Sidebar';
 import { toggleSidenav } from '@/config/toggleSide/toggleSidenav';
 import Navbar from '../Navbar';
+import Authenticating from '@/config/Authenticating/Authenticating';
 export default function ConnectUs() {
-
-
+  Authenticating();
+ 
     const [MessagesList, setMessagesList] = useState<MessagesT[]>([]);
     const User = useAppSelector((state) => state.User);
     const [Filter, setFilter] = useState<string>("");
@@ -62,7 +63,7 @@ export default function ConnectUs() {
                 // handle error
                 SetLoad(false)
                 if (error.request.status) {
-                    HandleLogOut();
+                    HandleLogOut(dispatch);
                 }
 
             })
@@ -129,7 +130,7 @@ export default function ConnectUs() {
                             // handle error
 
                             if (error.request.status) {
-                                HandleLogOut();
+                                HandleLogOut(dispatch);
                             }
 
                         })
@@ -169,7 +170,7 @@ export default function ConnectUs() {
                 // handle error
                 console.log(error)
                 if (error.request.status) {
-                    HandleLogOut();
+                    HandleLogOut(dispatch);
                 }
 
             })

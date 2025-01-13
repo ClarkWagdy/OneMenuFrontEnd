@@ -2,7 +2,7 @@
 
 import { createSlice } from '@reduxjs/toolkit'
 import { UserT } from './UserType';
-var initialState: UserT = {};
+var initialState: UserT = {  };
 if (typeof window !== 'undefined') {
     const user: string = localStorage.getItem('User') as string;
     initialState = JSON.parse(user) as UserT;

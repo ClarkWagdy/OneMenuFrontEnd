@@ -32,6 +32,7 @@ import Authenticating from '@/config/Authenticating/Authenticating';
 import HeadTag from '@/Component/Head/HeadTag';
 
 export default function Login() {
+    Authenticating();
   const [Load, setLoad] = useState<boolean>(false);
 
   const _Lan = useAppSelector((state) => state.Lan)
@@ -49,7 +50,7 @@ export default function Login() {
   }
 
 
-  Authenticating()
+
 
 
   return (<>
@@ -102,13 +103,14 @@ export default function Login() {
                 if (response.data.statusCode === 200 || response.data.statusCode === 202) {
                   var user: UserT = { ...response.data.data.user };
 
-                  console.log(response.data, user.type === UserEnum.Owner)
-                  if (user.type === UserEnum.Admin) {
-
+                  console.log(response.data, user?.type === UserEnum.Owner);
+                  if (user?.type === UserEnum.Admin) {
                     dispatch(SetUser(user));
                     redirect(`/dashboard`);
-                  } else if (user.type === UserEnum.Owner) {
-                    var restaurant: RestaurantT = { ...response.data.data.restaurant };
+                  } else if (user?.type === UserEnum.Owner) {
+                    var restaurant: RestaurantT = {
+                      ...response.data.data.restaurant,
+                    };
 
                     user.RestaurantId = restaurant.id;
                     dispatch(SetUser(user));

@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import HeadTag from '@/Component/Head/HeadTag'
 import { strings } from '@/config/localization/LocalizedStrings'
-import { redirect } from 'next/navigation';
-import Navbar from './Navbar';
+ import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import Home from './Home';
 import { Languages } from '@/config/localization/Languages';
@@ -17,20 +16,11 @@ import '/public/Dashboard/css/nucleo-svg.css'
 import '/public/Dashboard/css/nucleo-svg.css'
 import '/public/Dashboard/scss/soft-ui-dashboard.scss';
 import { toggleSidenav } from '@/config/toggleSide/toggleSidenav';
+import Authenticating from '@/config/Authenticating/Authenticating';
 
 export default function Dashboard() {
-  const user = window.localStorage.getItem('User');
 
-  if (user) {
-    let userdata = JSON.parse(user) as UserT;
-    if (!userdata.type || userdata.type != UserEnum.Admin) {
-      redirect('/login')
-    }
-  } else {
-    redirect('/login')
-  }
-
-
+  Authenticating();
   const dispatch = useAppDispatch();
   const DashboardPage = useAppSelector((state) => state.DashboardPage)
   const [CurrentPage, setCurrentPage] = useState(DashboardPage);

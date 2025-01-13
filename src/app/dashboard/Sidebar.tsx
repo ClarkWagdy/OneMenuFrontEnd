@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import classes from './Dashboard.module.scss';
 import axios from 'axios'
 import { url } from '@/config/Api/url'
-import { useAppSelector } from '@/config/Store/hooks'
+import { useAppDispatch, useAppSelector } from '@/config/Store/hooks'
 import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut'
 import { Interval } from '@/config/Intervaltime/Intervaltime'
 import '/public/Dashboard/css/nucleo-icons.css'
@@ -20,6 +20,7 @@ interface Props {
     CurrentPage: number,
 }
 export default function Sidebar(props: Props) {
+  const dispatch = useAppDispatch();
 
     const User = useAppSelector((state) => state.User);
     const NonRead = useAppSelector((state) => state.NonRead);
@@ -49,7 +50,7 @@ export default function Sidebar(props: Props) {
             .catch(function (error) {
                 console.log(error)
                 if (error.request.status) {
-                    HandleLogOut();
+                    HandleLogOut(dispatch);
                 }
             })
     }, [props.CurrentPage]);

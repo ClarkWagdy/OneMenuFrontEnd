@@ -42,27 +42,30 @@ export default function Layout({ children }: RootLayoutProps) {
       const user = localStorage.getItem('User');
       if (user) {
         let userdata = JSON.parse(user) as UserT;
-        if (userdata.type === UserEnum.Owner) {
+        if (userdata&&userdata.type === UserEnum.Owner) {
           dispatch(SetLoad(true));
-          axios.get(`${url}/restaurant/by-id/${userdata.RestaurantId}`)
+          axios
+            .get(`${url}/restaurant/by-id/${userdata.RestaurantId}`)
             .then(function (response) {
-
               if (response.status === 200) {
                 var restaurant: RestaurantT = { ...response.data.data };
                 dispatch(SetRestaurant(restaurant));
 
-                dispatch(SetLan(restaurant.defaultLanguage === 0 ? Languages.AR : Languages.EN))
-
+                dispatch(
+                  SetLan(
+                    restaurant.defaultLanguage === 0
+                      ? Languages.AR
+                      : Languages.EN,
+                  ),
+                );
               }
               dispatch(SetLoad(false));
-
             })
             .catch(function (error) {
               // handle error
               dispatch(SetLoad(false));
               console.log(error);
-            })
-
+            });
 
           dispatch(SetUser(userdata));
         }

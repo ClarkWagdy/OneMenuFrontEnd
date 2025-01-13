@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useCallback } from "react";
 import classes from '../Menu.module.scss';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper";
@@ -41,10 +41,9 @@ export default function Page() {
   const User = useAppSelector((state) => state.User);
   const Restaurant = useAppSelector((state) => state.Restaurant);
 
-
-
+ 
   useEffect(() => {
-
+//  handleGetproduct(categoryActive);
     if (!Restaurant || Object.keys(Restaurant).length === 0 && params?.id) {
       dispatch(SetLoad(true));
       axios.get(`${url}/restaurant/by-id/${params?.id}`)
@@ -214,26 +213,26 @@ export default function Page() {
   }
 
 
-  const [categoryActive, secategoryActive] = useState<string>(categoryRef.length > 0 ? categoryRef[0].id : '');
+  const [categoryActive, setcategoryActive] = useState<string>(categoryRef.length > 0 ? categoryRef[0].id : '');
 
-  useEffect(() => {
-    setMenuItemsLoad(true)
-    axios.get(`${url}/product/bycategory/${categoryActive}`)
-      .then(function (response) {
-        if (response.status === 200) {
-          setMenuItems(response.data.data ? response.data.data : [])
+   const handleGetproduct = useCallback((Id: string) => {
+     setMenuItemsLoad(true);
+     axios
+       .get(`${url}/product/bycategory/${Id}`)
+       .then(function (response) {
+         if (response.status === 200) {
+           setMenuItems(response.data.data ? response.data.data : []);
 
-          setMenuItemsLoad(false)
-        }
-
-
-      })
-      .catch(function (error) {
-        // handle error
-        setMenuItemsLoad(false)
-        console.log(error);
-      })
-  }, [categoryActive])
+           setMenuItemsLoad(false);
+         }
+       })
+       .catch(function (error) {
+         // handle error
+         setMenuItemsLoad(false);
+         console.log(error);
+       });
+   }, []);
+ 
   function EditItem(Item: ProductDTO) {
     return new Promise(function (resolve, reject) {
       let _MenuItems = [...MenuItems];
@@ -325,12 +324,12 @@ export default function Page() {
                 </button>
               ) : ""}
             </div>
-            {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
-              <button className={classes.LanBtn + " animate__animated animate__fadeIn"} onClick={() => HandleLogOut()}>
+            {(User?.type === UserType.Admin || User?.type === UserType.Owner) && EditFlag && (
+              <button className={classes.LanBtn + " animate__animated animate__fadeIn"} onClick={() => HandleLogOut(dispatch)}>
                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="40" height="40" x="0" y="0" viewBox="0 0 24 24"   ><g><g fill="tomato"><path d="M12 3.25a.75.75 0 0 1 0 1.5 7.25 7.25 0 0 0 0 14.5.75.75 0 0 1 0 1.5 8.75 8.75 0 1 1 0-17.5z" fill="tomato" opacity="1" data-original="tomato" ></path><path d="M16.47 9.53a.75.75 0 0 1 1.06-1.06l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H10a.75.75 0 0 1 0-1.5h8.19z" fill="tomato" opacity="1" data-original="tomato" ></path></g></g></svg>
               </button>
             )}
-            {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+            {(User?.type === UserType.Admin || User?.type === UserType.Owner) && EditFlag && (
               <button onClick={() => { setSettingModal(true) }} className={classes.btn + " animate__animated animate__fadeIn " + classes.btnSettings}>
 
                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="25" height="25" x="0" y="0" viewBox="0 0 32 32"  ><g><path d="M29.21 11.84a3.92 3.92 0 0 1-3.09-5.3 1.84 1.84 0 0 0-.55-2.07 14.75 14.75 0 0 0-4.4-2.55 1.85 1.85 0 0 0-2.09.58 3.91 3.91 0 0 1-6.16 0 1.85 1.85 0 0 0-2.09-.58 14.82 14.82 0 0 0-4.1 2.3 1.86 1.86 0 0 0-.58 2.13 3.9 3.9 0 0 1-3.25 5.36 1.85 1.85 0 0 0-1.62 1.49A14.14 14.14 0 0 0 1 16a14.32 14.32 0 0 0 .19 2.35 1.85 1.85 0 0 0 1.63 1.55A3.9 3.9 0 0 1 6 25.41a1.82 1.82 0 0 0 .51 2.18 14.86 14.86 0 0 0 4.36 2.51 2 2 0 0 0 .63.11 1.84 1.84 0 0 0 1.5-.78 3.87 3.87 0 0 1 3.2-1.68 3.92 3.92 0 0 1 3.14 1.58 1.84 1.84 0 0 0 2.16.61 15 15 0 0 0 4-2.39 1.85 1.85 0 0 0 .54-2.11 3.9 3.9 0 0 1 3.13-5.39 1.85 1.85 0 0 0 1.57-1.52A14.5 14.5 0 0 0 31 16a14.35 14.35 0 0 0-.25-2.67 1.83 1.83 0 0 0-1.54-1.49zM21 16a5 5 0 1 1-5-5 5 5 0 0 1 5 5z" data-name="Layer 2" fill="#000000" data-original="#000000" ></path></g></svg>
@@ -409,14 +408,16 @@ export default function Page() {
                 navigation={false}
 
                 modules={[Pagination]}
-                className={classes.SwiperMenuList + ` ${User.type === UserType.Admin || User.type === UserType.Owner ? classes.PadInEnd40px : " "}`}
+                className={classes.SwiperMenuList + ` ${User?.type === UserType.Admin || User?.type === UserType.Owner ? classes.PadInEnd40px : " "}`}
               >
                 {category.map(Categ => {
 
                   return (
                     <SwiperSlide key={`${Categ.id}${Categ.nameEn}`}
                       className={classes.MenuList + `   mx-3 ${Categ.id === categoryActive ? classes.active : ""}`} >
-                      <div onClick={() => secategoryActive(Categ.id)} style={Categ.id === categoryActive ? { borderBottomColor: `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'})` } : {}}
+                      <div onClick={() =>{handleGetproduct(Categ.id);
+                        setcategoryActive(Categ.id)
+                      } } style={Categ.id === categoryActive ? { borderBottomColor: `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'})` } : {}}
                         onMouseEnter={ele => { Categ.id != categoryActive ? ele.currentTarget.style.borderBottomColor = `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'})` : null }}
                         onMouseLeave={ele => { Categ.id != categoryActive ? ele.currentTarget.style.borderBottomColor = 'transparent' : null }} >
                         {strings.getLanguage() === Languages.AR ? Categ.nameAr : Categ.nameEn}
@@ -426,7 +427,7 @@ export default function Page() {
                 })}
               </Swiper>)}
 
-            {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+            {(User?.type === UserType.Admin || User?.type === UserType.Owner) && EditFlag && (
               <div  >
                 {category.length === 0 && (
                   <div>
@@ -464,7 +465,7 @@ export default function Page() {
                 )
               }) : (<NoItems />)}
 
-              {(User.type === UserType.Admin || User.type === UserType.Owner) && EditFlag && (
+              {(User?.type === UserType.Admin || User?.type === UserType.Owner) && EditFlag && (
                 <div onClick={() => { setCreateOrEditItemModal(true) }} className={`animate__fadeIn animate__animated  ${MenuItems.length > 0 ? `${classes.ProductCard + " " + classes.AddProductCard}` : classes.AddBtn}`}
                   style={MenuItems.length > 0 ? { backgroundColor: `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'},0.1)`, borderColor: `rgba(${Restaurant ? Restaurant.color : '63, 63, 63'})` } : {}}>
 
@@ -502,7 +503,7 @@ export default function Page() {
 
 
 
-        {User.type === UserType.Admin || User.type === UserType.Owner && (
+        {User?.type === UserType.Admin || User?.type === UserType.Owner && (
           <button
             className={classes.AddIconCard + " animate__animated animate__fadeIn " + classes.EditViewBtn}
             onMouseEnter={ele => { ele.currentTarget.style.backgroundColor = `rgba(${Restaurant.color})` }} onMouseLeave={ele => { ele.currentTarget.style.backgroundColor = 'rgba(0, 0, 0,0.8)' }}

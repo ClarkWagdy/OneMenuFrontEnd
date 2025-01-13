@@ -2,7 +2,7 @@
 import { RestaurantLogoPath, url } from '@/config/Api/url';
 import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut';
 import { strings } from '@/config/localization/LocalizedStrings'
-import { useAppSelector } from '@/config/Store/hooks';
+import { useAppDispatch, useAppSelector } from '@/config/Store/hooks';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import classes from '../Dashboard.module.scss'
@@ -20,8 +20,12 @@ import { toggleSidenav } from '@/config/toggleSide/toggleSidenav';
 import { Languages } from '@/config/localization/Languages';
 import Navbar from '../Navbar';
 import ClientModal from './ClientModal/ClientModal';
+import Authenticating from '@/config/Authenticating/Authenticating';
 
 export default function Subscribers() {
+      Authenticating();
+      const dispatch = useAppDispatch();
+
     const { Canvas } = useQRCode()
     const [ResturantList, setResturantList] = useState<ResturantT[]>([]);
     const User = useAppSelector((state) => state.User);
@@ -68,7 +72,7 @@ export default function Subscribers() {
                 // handle error
                 SetLoad(false)
                 if (error.request.status) {
-                    HandleLogOut();
+                    HandleLogOut(dispatch);
                 }
 
             })

@@ -29,7 +29,7 @@ const ItemCard: FC<Props> = (props) => {
     <div className={classes.ProductCard}>
 
 
-      {(User.type === UserType.Admin || User.type === UserType.Owner) && props.EditFlag && (<>
+      {(User?.type === UserType.Admin || User?.type === UserType.Owner) && props.EditFlag && (<>
         <div className={classes.btnsEditCard + '    w-100 d-flex justify-content-between align-items-center'}>
 
 
