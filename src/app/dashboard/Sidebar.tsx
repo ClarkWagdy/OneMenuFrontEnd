@@ -49,7 +49,7 @@ export default function Sidebar(props: Props) {
             })
             .catch(function (error) {
                 console.log(error)
-                if (error.request.status) {
+                if (error?.request.status===401) {
                     HandleLogOut(dispatch);
                 }
             })
