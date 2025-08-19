@@ -28,6 +28,14 @@ interface Props {
     Id?: string
 }
 export default function ClientModal(props: Props) {
+  function hexToRgb(hex: any): string {
+    const bigint = parseInt(hex.slice(1), 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r}, ${g}, ${b}`;
+  }
+
     const [Load, setLoad] = useState<boolean>(false);
     const [Done, setDone] = useState<boolean>(false);
     const [image, setImage] = useState<any>();
@@ -137,62 +145,66 @@ setRestaurantData(response.data.data);
             valuesData.append("userName", values.userName);
             valuesData.append("password", values.password);
             valuesData.append("restaurantName", values.restaurantName);
-            valuesData.append("restaurantColor", values.restaurantColor);
-
+            valuesData.append(
+              "restaurantColor",
+              hexToRgb(values.restaurantColor),
+            );
             if (image) {
               valuesData.append("restaurantLogo", image);
-            }
+            } else if(values.restaurantLogo) {
+              valuesData.append("restaurantLogo", values.restaurantLogo);
 
-            axios
-              .post(`${url}/user/owner-restaurant`, valuesData, {
-                headers: {
-                  Authorization: User.token,
-                },
-              })
-              .then(function (response) {
-                console.log(response.data);
-                if (response.data.statusCode === 202) {
-                  setDone(true);
-                  setTimeout(() => {
-                    props.SetAddClientModal(false);
-                  }, 850);
-                }
-              })
-              .catch(function (error) {
-                console.log(error);
-                // handle error
-                setLoad(false);
-                if (
-                  error.response.data.error.message
-                    .toLowerCase()
-                    .includes("duplicate")
-                ) {
-                  toast.error(strings.Thisuseralreadyexists, {
-                    position: "bottom-right",
-                    autoClose: 25000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                  });
-                  actions.resetForm();
-                } else if (error.request.status === 401) {
-                  toast.error(strings.Anerroroccurred, {
-                    position: "bottom-right",
-                    autoClose: 25000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                  });
-                  localStorage.clear();
-                  window.location.replace("/login");
-                }
-              });
+            }
+              axios
+                .post(`${url}/user/owner-restaurant`, valuesData, {
+                  headers: {
+                    Authorization: User.token,
+                  },
+                })
+                .then(function (response) {
+                  console.log(response.data);
+                  if (response.data.statusCode === 202) {
+                    setDone(true);
+                    setTimeout(() => {
+                      props.SetAddClientModal(false);
+                    }, 850);
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                  // handle error
+                  setLoad(false);
+                  if (
+                    error.response.data.error.message
+                      .toLowerCase()
+                      .includes("duplicate")
+                  ) {
+                    toast.error(strings.Thisuseralreadyexists, {
+                      position: "bottom-right",
+                      autoClose: 25000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "dark",
+                    });
+                    actions.resetForm();
+                  } else if (error.request.status === 401) {
+                    toast.error(strings.Anerroroccurred, {
+                      position: "bottom-right",
+                      autoClose: 25000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "dark",
+                    });
+                    localStorage.clear();
+                    window.location.replace("/login");
+                  }
+                });
           }}
         >
           {({ errors, touched, values, setFieldValue }) => (
