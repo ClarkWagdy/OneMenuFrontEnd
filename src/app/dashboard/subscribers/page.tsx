@@ -7,7 +7,8 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import classes from '../Dashboard.module.scss'
 import { ResturantT } from '../Type';
-import Switch from "react-switch";
+// @ts-ignore
+const Switch = require("react-switch").default;
 import NoItems from '@/Component/NoItems/NoItems';
 import Loading from '@/Component/Loading/Loading';
 import { useQRCode } from 'next-qrcode';
@@ -21,6 +22,7 @@ import { Languages } from '@/config/localization/Languages';
 import Navbar from '../Navbar';
 import ClientModal from './ClientModal/ClientModal';
 import Authenticating from '@/config/Authenticating/Authenticating';
+import QRCode from "qrcode";
 
 export default function Subscribers() {
       Authenticating();
@@ -41,18 +43,32 @@ export default function Subscribers() {
 
     const [PageNumber, setPageNumber] = useState<number>(1);
 
-    function HandleChange(e: any) {
+    function HandleChange(e: any,id:string) {
         console.log(e)
     }
 
-    function HandleDownload(name: string, id: string) {
-        if (typeof document !== "undefined")
-       {
-           const canva = document.getElementsByTagName("canvas")[0];
-           canva.toBlob((blob: any) => {
-             saveAs(blob, `${name}.png`);
-           });
-       }
+    async function HandleDownload(name: string, id: string) {
+    
+
+
+try {
+  const text = `${window.location.host}/menu/${id}`; // replace with dynamic data
+  const qrDataUrl = await QRCode.toDataURL(text, { width: 1400 });
+  
+  // auto download
+  const link = document.createElement("a");
+  link.href = qrDataUrl;
+  link.download = `${name}.png`;
+  link.click();
+} catch (err) {
+  console.error(err);
+}
+
+
+
+
+
+
     }
     useEffect(() => {
       axios
@@ -263,8 +279,8 @@ export default function Subscribers() {
 
                                         <td className="align-middle text-center text-sm">
                                           <Switch
-                                            onChange={(e) => {
-                                              HandleChange(e);
+                                            onChange={(e:any) => {
+                                              HandleChange(e,ele.id);
                                             }}
                                             checked={
                                               ele.isActive ? true : false
@@ -293,7 +309,7 @@ export default function Subscribers() {
                                               errorCorrectionLevel: "H",
                                               margin: 3,
                                               scale: 1,
-                                              width: 50,
+                                              width: 80,
                                               color: {
                                                 dark: "#3f3f3f",
                                                 light: "#fff",
