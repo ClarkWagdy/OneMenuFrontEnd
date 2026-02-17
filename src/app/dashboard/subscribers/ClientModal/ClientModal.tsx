@@ -21,27 +21,42 @@ import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut';
 import { useAppSelector } from '@/config/Store/hooks';
 import Image from 'next/image';
 import { RestaurantDataDTO } from './types';
+import { set } from 'animejs';
  
 interface Props {
-    show: Boolean,
+ AddClientModal: {state:boolean,id:string},
     SetAddClientModal: Function,
-    Id?: string
+  
 }
-export default function ClientModal(props: Props) {
-  function hexToRgb(hex: any): string {
+
+
+  export function hexToRgb(hex: any): string {
     const bigint = parseInt(hex.slice(1), 16);
     const r = (bigint >> 16) & 255;
     const g = (bigint >> 8) & 255;
     const b = bigint & 255;
     return `${r}, ${g}, ${b}`;
   }
+  export  function rgbToHex(r: string): string {
+  return (
+    "#" +
+    [r.split(',')[0], r.split(',')[1], r.split(',')[2]]
+      .map((x) => {
+        const hex = Number(x).toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
+}
+
+export default function ClientModal(props: Props) {
 
     const [Load, setLoad] = useState<boolean>(false);
     const [Done, setDone] = useState<boolean>(false);
     const [image, setImage] = useState<any>();
     const [RestaurantData, setRestaurantData] = useState<RestaurantDataDTO>();
 
-      const router = useRouter();
+ 
   const User = useAppSelector((state) => state.User);
 
     function onChangeImage(event: any, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void) {
@@ -53,16 +68,17 @@ export default function ClientModal(props: Props) {
 
     }
     useEffect(() => {
-      if (props.Id) {
+      console.log(props.AddClientModal);
+      if (props.AddClientModal.id) {
         axios
-          .get(`${url}/restaurant/for-edit-by-id/${props.Id}`, {
+          .get(`${url}/restaurant/for-edit-by-id/${props.AddClientModal.id}`, {
             headers: {
               Authorization: User.token,
             },
           })
           .then((response) => {
             if(response.data.statusCode === 202){
-setRestaurantData(response.data.data);
+            setRestaurantData(response.data.data);
  
             }
             
@@ -71,15 +87,24 @@ setRestaurantData(response.data.data);
             console.log(error);
           });
       }
-    }, [props.Id]);
+    }, [props.AddClientModal.id]);
     return (
-      <Modal show={props.show ? true : false} centered>
+      <Modal show={props.AddClientModal.state ? true : false} centered>
         <Modal.Header className="pb-0">
           <div className="d-flex w-100 justify-content-between  ">
             <h4 className="m-0 p-0">{strings.AddNewClient}</h4>
             <span
               style={{ cursor: "pointer" }}
-              onClick={() => props.SetAddClientModal(false)}
+              onClick={() =>
+             {
+              
+                props.SetAddClientModal((prev:any)=>{return {...prev,state:false,id:""}})
+                setImage(undefined);
+                setRestaurantData(undefined);
+                setDone(false); 
+                setLoad(false);
+             }
+                }
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -106,10 +131,14 @@ setRestaurantData(response.data.data);
             </span>
           </div>
         </Modal.Header>
-
+ 
         <Formik
           enableReinitialize={true}
           initialValues={{
+            id:RestaurantData?.id,
+             offerStatus: RestaurantData?.offerStatus,
+    videoStatus : RestaurantData?.videoStatus,
+    isActive : RestaurantData?.isActive,
             name: RestaurantData?.ownerName,
             phoneNumber: RestaurantData?.ownerPhoneNumber,
             email: RestaurantData?.ownerEmail,
@@ -137,8 +166,13 @@ setRestaurantData(response.data.data);
           })}
           onSubmit={async (values, actions) => {
             setLoad(true);
-
+ 
             var valuesData: any = new FormData();
+            valuesData.append("id", values.id); 
+            valuesData.append("offerStatus", values.offerStatus);
+            valuesData.append("videoStatus", values.videoStatus);
+            valuesData.append("isActive", values.isActive); 
+
             valuesData.append("name", values.name);
             valuesData.append("phoneNumber", values.phoneNumber);
             valuesData.append("email", values.email);
@@ -166,7 +200,7 @@ setRestaurantData(response.data.data);
                   if (response.data.statusCode === 202) {
                     setDone(true);
                     setTimeout(() => {
-                      props.SetAddClientModal(false);
+                      props.SetAddClientModal((prev:any)=>{return {...prev,state:false,id:""}})
                     }, 850);
                   }
                 })
@@ -402,6 +436,7 @@ setRestaurantData(response.data.data);
                     disabled={Load}
                     className={""}
                     autoComplete="off"
+                    value={rgbToHex(values.restaurantColor?values.restaurantColor:"#000000")}
                     type="color"
                     name={"restaurantColor"}
                   />

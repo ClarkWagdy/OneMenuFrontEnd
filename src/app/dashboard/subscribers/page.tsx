@@ -37,7 +37,7 @@ export default function Subscribers() {
     const [write, Setwrite] = useState<boolean>(false);
     const [done, Setdone] = useState<boolean>(false);
 
-    const [AddClientModal, SetAddClientModal] = useState<boolean>(false);
+    const [AddClientModal, SetAddClientModal] = useState<{state:boolean,id:string}>({state:false,id:""});
     const [ResID, SetResID] = useState<string>("");
 
 
@@ -162,7 +162,7 @@ try {
 
                       <button
                         className="btn bg-gradient-dark mb-0"
-                        onClick={() => SetAddClientModal(true)}
+                        onClick={() => SetAddClientModal(prev=>{return {...prev,state:true,id:""}})}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -408,8 +408,8 @@ try {
                                             data-toggle="tooltip"
                                             data-original-title="Edit user"
                                             onClick={() => {
-                                              SetResID(ele.id);
-                                              SetAddClientModal(true);
+                                            
+                                              SetAddClientModal(prev=>{return {state:true,id:ele.id}})
                                             }}
                                           >
                                             Edit
@@ -471,8 +471,8 @@ try {
               </Modal>
 
               <ClientModal
-                show={AddClientModal}
-                Id={ResID}
+                AddClientModal={AddClientModal}
+       
                 SetAddClientModal={SetAddClientModal}
               />
             </div>
