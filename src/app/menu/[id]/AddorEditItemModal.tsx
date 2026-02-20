@@ -41,6 +41,7 @@ const AddorEditItemModal: FC<Props> = (props) => {
   function onChangeImage(event: any, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void) {
     if (event.target.files && event.target.files[0]) {
       setImage(event.target.files[0]);
+      console.log(URL.createObjectURL(event.target.files[0]));
       setFieldValue('image', URL.createObjectURL(event.target.files[0]))
     }
 
