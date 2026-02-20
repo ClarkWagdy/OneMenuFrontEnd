@@ -409,9 +409,7 @@ export default function Page() {
                 </button>
               )}
           </div>
-
           {/* video */}
-      
           {Restaurant.videoStatus && (
             <div className={classes.MediaVideosection}>
               <div
