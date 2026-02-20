@@ -2,7 +2,6 @@ import { ServicesList } from '@/config/Services/Services';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
-
 export default function Services() {
   return (
     <>
