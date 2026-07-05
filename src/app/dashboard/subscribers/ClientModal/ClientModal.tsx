@@ -164,7 +164,7 @@ export default function ClientModal(props: Props) {
               .oneOf([Yup.ref("password"), ""], strings.Passwordsmustmatch)
               .required(strings.cPassword),
           })}
-          onSubmit={async (values, actions) => {
+          onSubmit={(values, actions) => {
             setLoad(true);
  
             var valuesData: any = new FormData();
@@ -189,8 +189,8 @@ export default function ClientModal(props: Props) {
               valuesData.append("restaurantLogo", values.restaurantLogo);
 
             }
-              axios
-                .post(`${url}/user/owner-restaurant`, valuesData, {
+            console.log(valuesData);
+            axios.post(`${url}/user/owner-restaurant`, valuesData, {
                   headers: {
                     Authorization: User.token,
                   },
