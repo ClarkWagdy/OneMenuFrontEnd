@@ -260,7 +260,7 @@ export default function ClientModal(props: Props) {
                     <img
                       src={
                         values.restaurantLogo
-                          ? `${RestaurantLogoPath}/${values.restaurantLogo}
+                          ? `${values.restaurantLogo}
 `
                           : itemImage.src
                       }
