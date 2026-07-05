@@ -95,16 +95,15 @@ export default function ClientModal(props: Props) {
             <h4 className="m-0 p-0">{strings.AddNewClient}</h4>
             <span
               style={{ cursor: "pointer" }}
-              onClick={() =>
-             {
-              
-                props.SetAddClientModal((prev:any)=>{return {...prev,state:false,id:""}})
+              onClick={() => {
+                props.SetAddClientModal((prev: any) => {
+                  return { ...prev, state: false, id: "" };
+                });
                 setImage(undefined);
                 setRestaurantData(undefined);
-                setDone(false); 
+                setDone(false);
                 setLoad(false);
-             }
-                }
+              }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -131,14 +130,14 @@ export default function ClientModal(props: Props) {
             </span>
           </div>
         </Modal.Header>
- 
+
         <Formik
           enableReinitialize={true}
           initialValues={{
-            id:RestaurantData?.id,
-             offerStatus: RestaurantData?.offerStatus,
-    videoStatus : RestaurantData?.videoStatus,
-    isActive : RestaurantData?.isActive,
+            id: RestaurantData?.id,
+            offerStatus: RestaurantData?.offerStatus,
+            videoStatus: RestaurantData?.videoStatus,
+            isActive: RestaurantData?.isActive,
             name: RestaurantData?.ownerName,
             phoneNumber: RestaurantData?.ownerPhoneNumber,
             email: RestaurantData?.ownerEmail,
@@ -166,12 +165,12 @@ export default function ClientModal(props: Props) {
           })}
           onSubmit={(values, actions) => {
             setLoad(true);
- 
+
             var valuesData: any = new FormData();
-            valuesData.append("id", values.id); 
+            valuesData.append("id", values.id);
             valuesData.append("offerStatus", values.offerStatus);
             valuesData.append("videoStatus", values.videoStatus);
-            valuesData.append("isActive", values.isActive); 
+            valuesData.append("isActive", values.isActive);
 
             valuesData.append("name", values.name);
             valuesData.append("phoneNumber", values.phoneNumber);
@@ -185,60 +184,62 @@ export default function ClientModal(props: Props) {
             );
             if (image) {
               valuesData.append("restaurantLogo", image);
-            } else if(values.restaurantLogo) {
+            } else if (values.restaurantLogo) {
               valuesData.append("restaurantLogo", values.restaurantLogo);
-
             }
             console.log(valuesData);
-            axios.post(`${url}/user/owner-restaurant`, valuesData, {
-                  headers: {
-                    Authorization: User.token,
-                  },
-                })
-                .then(function (response) {
-                  console.log(response.data);
-                  if (response.data.statusCode === 202) {
-                    setDone(true);
-                    setTimeout(() => {
-                      props.SetAddClientModal((prev:any)=>{return {...prev,state:false,id:""}})
-                    }, 850);
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                  // handle error
-                  setLoad(false);
-                  if (
-                    error.response.data.error.message
-                      .toLowerCase()
-                      .includes("duplicate")
-                  ) {
-                    toast.error(strings.Thisuseralreadyexists, {
-                      position: "bottom-right",
-                      autoClose: 25000,
-                      hideProgressBar: false,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      theme: "dark",
+            axios
+              .post(`${url}/user/owner-restaurant`, valuesData, {
+                headers: {
+                  Authorization: User.token,
+                },
+              })
+              .then(function (response) {
+                console.log(response.data);
+                if (response.data.statusCode === 202) {
+                  setDone(true);
+                  setTimeout(() => {
+                    props.SetAddClientModal((prev: any) => {
+                      return { ...prev, state: false, id: "" };
                     });
-                    actions.resetForm();
-                  } else if (error.request.status === 401) {
-                    toast.error(strings.Anerroroccurred, {
-                      position: "bottom-right",
-                      autoClose: 25000,
-                      hideProgressBar: false,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      theme: "dark",
-                    });
-                    localStorage.clear();
-                    window.location.replace("/login");
-                  }
-                });
+                  }, 850);
+                }
+              })
+              .catch(function (error) {
+                console.log(error);
+                // handle error
+                setLoad(false);
+                if (
+                  error.response.data.error.message
+                    .toLowerCase()
+                    .includes("duplicate")
+                ) {
+                  toast.error(strings.Thisuseralreadyexists, {
+                    position: "bottom-right",
+                    autoClose: 25000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  actions.resetForm();
+                } else if (error.request.status === 401) {
+                  toast.error(strings.Anerroroccurred, {
+                    position: "bottom-right",
+                    autoClose: 25000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  localStorage.clear();
+                  window.location.replace("/login");
+                }
+              });
           }}
         >
           {({ errors, touched, values, setFieldValue }) => (
@@ -436,7 +437,15 @@ export default function ClientModal(props: Props) {
                     disabled={Load}
                     className={""}
                     autoComplete="off"
-                    value={rgbToHex(values.restaurantColor?values.restaurantColor:"#000000")}
+                    value={
+                      values.restaurantColor
+                        ? values.restaurantColor
+                        : rgbToHex(
+                            values.restaurantColor
+                              ? values.restaurantColor
+                              : "#000000",
+                          )
+                    }
                     type="color"
                     name={"restaurantColor"}
                   />
