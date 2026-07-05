@@ -436,7 +436,7 @@ export default function ClientModal(props: Props) {
                     id="restaurantColor"
                     disabled={Load}
                     className={""}
-                    autoComplete="off"
+                 
                     value={
                       values.restaurantColor
                         ? values.restaurantColor
