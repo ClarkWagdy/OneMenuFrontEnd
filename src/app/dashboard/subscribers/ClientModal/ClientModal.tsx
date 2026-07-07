@@ -30,13 +30,15 @@ interface Props {
 }
 
 
-  export function hexToRgb(hex: any): string {
-    const bigint = parseInt(hex.slice(1), 16);
-    const r = (bigint >> 16) & 255;
-    const g = (bigint >> 8) & 255;
-    const b = bigint & 255;
-    return `${r}, ${g}, ${b}`;
-  }
+ const hexToRgb = (hex?: string) => {
+  if (!hex) return null;
+
+  return {
+    r: parseInt(hex.slice(1, 3), 16),
+    g: parseInt(hex.slice(3, 5), 16),
+    b: parseInt(hex.slice(5, 7), 16),
+  };
+};
   export  function rgbToHex(r: string): string {
   return (
     "#" +
@@ -260,9 +262,12 @@ export default function ClientModal(props: Props) {
                   <div className={classes.AddItemImageForm}>
                     <img
                       src={
+                        RestaurantData?.logo?
+                        `${RestaurantLogoPath}/${values.restaurantLogo}`
+                        :
                         values.restaurantLogo
-                          ? `${values.restaurantLogo}
-`
+                          ? `${values.restaurantLogo}`
+
                           : itemImage.src
                       }
                       alt=""
