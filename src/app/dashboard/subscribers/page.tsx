@@ -44,6 +44,7 @@ export default function Subscribers() {
     const [PageNumber, setPageNumber] = useState<number>(1);
 
     function HandleChange(e: any,id:string) {
+      
         console.log(e)
     }
 
@@ -244,6 +245,9 @@ try {
                                       QR
                                     </th>
                                     <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                      Link
+                                    </th>
+                                    <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                       Write NfC
                                     </th>
 
@@ -296,6 +300,7 @@ try {
                                             width={48}
                                           />
                                         </td>
+                                 
                                         <td
                                           id={ele.id}
                                           className="  qr d-flex align-items-center justify-content-center"
@@ -341,6 +346,12 @@ try {
                                               </g>
                                             </svg>
                                           </button>
+                                        </td>
+                                               <td className="align-middle text-center text-sm"
+                                        >
+                                       <a href={`${window.location.host}/menu/${ele.id}`} target="_blank" >
+                                          Link
+                                        </a>
                                         </td>
                                         <td className="text-center">
                                           <button

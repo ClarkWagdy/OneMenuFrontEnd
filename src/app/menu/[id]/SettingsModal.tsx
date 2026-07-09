@@ -67,11 +67,18 @@ const SettingsModal: FC<Props> = (props: Props) => {
     formData.append("offerStatus", Offers);
 
 
-    for (const image of Images) {
-      console.log(image)
-      formData.append("offers", image);
-    }
+    // for (const image of Images) {
+    //   console.log(image)
+    //   formData.append("offers", image);
+    // }
 
+    for (const image of Images) {
+  if (image instanceof File) {
+    formData.append("offers", image);
+  } else if (typeof image === "string") {
+    formData.append("existingOffers", image); // or however backend distinguishes
+  }
+}
     formData.append("videoStatus", Video);
     formData.append("video", Videofile);
     formData.append("isActive", true);

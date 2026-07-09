@@ -32,7 +32,6 @@ interface Props {
 
  const hexToRgb = (hex?: string) => {
   if (!hex) return null;
-
   return {
     r: parseInt(hex.slice(1, 3), 16),
     g: parseInt(hex.slice(3, 5), 16),
@@ -167,7 +166,7 @@ export default function ClientModal(props: Props) {
           })}
           onSubmit={(values, actions) => {
             setLoad(true);
-
+ 
             var valuesData: any = new FormData();
             valuesData.append("id", values.id);
             valuesData.append("offerStatus", values.offerStatus);
@@ -182,14 +181,69 @@ export default function ClientModal(props: Props) {
             valuesData.append("restaurantName", values.restaurantName);
             valuesData.append(
               "restaurantColor",
-              hexToRgb(values.restaurantColor),
-            );
+ JSON.stringify(hexToRgb(values.restaurantColor)),            );
             if (image) {
               valuesData.append("restaurantLogo", image);
             } else if (values.restaurantLogo) {
               valuesData.append("restaurantLogo", values.restaurantLogo);
             }
-            console.log(valuesData);
+          
+            if(props.AddClientModal.id){
+console.log(valuesData.get("restaurantColor"),hexToRgb(values.restaurantColor));
+    axios
+              .post(`${url}/restaurant/edit`, valuesData, {
+                headers: {
+                  Authorization: User.token,
+                },
+              })
+              .then(function (response) {
+                console.log(response.data);
+                if (response.data.statusCode === 202) {
+                  setDone(true);
+                  setTimeout(() => {
+                    props.SetAddClientModal((prev: any) => {
+                      return { ...prev, state: false, id: "" };
+                    });
+                  }, 850);
+                }
+              })
+              .catch(function (error) {
+                console.log(error);
+                // handle error
+                setLoad(false);
+                if (
+                  error.response.data.error.message
+                    .toLowerCase()
+                    .includes("duplicate")
+                ) {
+                  toast.error(strings.Thisuseralreadyexists, {
+                    position: "bottom-right",
+                    autoClose: 25000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  actions.resetForm();
+                } else if (error.request.status === 401) {
+                  toast.error(strings.Anerroroccurred, {
+                    position: "bottom-right",
+                    autoClose: 25000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                  });
+                  localStorage.clear();
+                  window.location.replace("/login");
+                }
+              });
+              return;
+            }
             axios
               .post(`${url}/user/owner-restaurant`, valuesData, {
                 headers: {
