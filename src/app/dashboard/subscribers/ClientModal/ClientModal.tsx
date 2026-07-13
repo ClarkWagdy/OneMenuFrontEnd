@@ -51,7 +51,7 @@ interface Props {
 }
 
 export default function ClientModal(props: Props) {
-
+const [isSubmitting, setIsSubmitting] = useState(false);
     const [Load, setLoad] = useState<boolean>(false);
     const [Done, setDone] = useState<boolean>(false);
     const [image, setImage] = useState<any>();
@@ -68,27 +68,23 @@ export default function ClientModal(props: Props) {
 
 
     }
-    useEffect(() => {
-      console.log(props.AddClientModal);
-      if (props.AddClientModal.id) {
-        axios
-          .get(`${url}/restaurant/for-edit-by-id/${props.AddClientModal.id}`, {
-            headers: {
-              Authorization: User.token,
-            },
-          })
-          .then((response) => {
-            if(response.data.statusCode === 202){
-            setRestaurantData(response.data.data);
- 
-            }
-            
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      }
-    }, [props.AddClientModal.id]);
+useEffect(() => {
+  if (props.AddClientModal.id) {
+    axios
+      .get(`${url}/restaurant/for-edit-by-id/${props.AddClientModal.id}`, {
+        headers: { Authorization: User.token },
+      })
+      .then((response) => {
+        // Don't gate on a specific status code for a GET — 200 means success.
+        if (response.status === 200 && response.data) {
+          setRestaurantData(response.data.data ?? response.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+}, [props.AddClientModal.id]);
     return (
       <Modal show={props.AddClientModal.state ? true : false} centered>
         <Modal.Header className="pb-0">
@@ -135,10 +131,10 @@ export default function ClientModal(props: Props) {
         <Formik
           enableReinitialize={true}
           initialValues={{
-            id: RestaurantData?.id,
-            offerStatus: RestaurantData?.offerStatus,
-            videoStatus: RestaurantData?.videoStatus,
-            isActive: RestaurantData?.isActive,
+            id: RestaurantData?.id ?? "",
+            offerStatus: RestaurantData?.offerStatus ?? false,
+            videoStatus: RestaurantData?.videoStatus ?? false,
+            isActive: RestaurantData?.isActive ?? false,
             name: RestaurantData?.ownerName,
             phoneNumber: RestaurantData?.ownerPhoneNumber,
             email: RestaurantData?.ownerEmail,
@@ -165,14 +161,18 @@ export default function ClientModal(props: Props) {
               .required(strings.cPassword),
           })}
           onSubmit={(values, actions) => {
-            setLoad(true);
- 
+             if (isSubmitting) return; // hard guard, doesn't wait on React's async state batching
+                setIsSubmitting(true);
+                 setLoad(true);
+            console.log(values);
+              // Only include id when editing an existing restaurant
+            if (props.AddClientModal.id) {
+              valuesData.append("id", values.id);
+            }
             var valuesData: any = new FormData();
-            valuesData.append("id", values.id);
-            valuesData.append("offerStatus", values.offerStatus);
+             valuesData.append("offerStatus", values.offerStatus);
             valuesData.append("videoStatus", values.videoStatus);
             valuesData.append("isActive", values.isActive);
-
             valuesData.append("name", values.name);
             valuesData.append("phoneNumber", values.phoneNumber);
             valuesData.append("email", values.email);
@@ -181,19 +181,21 @@ export default function ClientModal(props: Props) {
             valuesData.append("restaurantName", values.restaurantName);
             valuesData.append(
               "restaurantColor",
- JSON.stringify(hexToRgb(values.restaurantColor)),            );
+ JSON.stringify(hexToRgb(values.restaurantColor))            );
             if (image) {
               valuesData.append("restaurantLogo", image);
             } else if (values.restaurantLogo) {
               valuesData.append("restaurantLogo", values.restaurantLogo);
+            }else{
+              valuesData.append("restaurantLogo", RestaurantData?.logo);
+
             }
           
             if(props.AddClientModal.id){
-console.log(valuesData.get("restaurantColor"),hexToRgb(values.restaurantColor));
-    axios
-              .post(`${url}/restaurant/edit`, valuesData, {
+              console.log("Editing existing client",valuesData);
+          axios.put(`${url}/restaurant`, valuesData, {
                 headers: {
-                  Authorization: User.token,
+                  Authorization: 'Bearer '+ User.token
                 },
               })
               .then(function (response) {
@@ -244,8 +246,7 @@ console.log(valuesData.get("restaurantColor"),hexToRgb(values.restaurantColor));
               });
               return;
             }
-            axios
-              .post(`${url}/user/owner-restaurant`, valuesData, {
+            axios.post(`${url}/user/owner-restaurant`, valuesData, {
                 headers: {
                   Authorization: User.token,
                 },
@@ -316,6 +317,8 @@ console.log(valuesData.get("restaurantColor"),hexToRgb(values.restaurantColor));
                   <div className={classes.AddItemImageForm}>
                     <img
                       src={
+                        values.restaurantLogo?.includes("blob")?
+                          values.restaurantLogo:
                         RestaurantData?.logo?
                         `${RestaurantLogoPath}/${values.restaurantLogo}`
                         :
@@ -511,8 +514,9 @@ console.log(valuesData.get("restaurantColor"),hexToRgb(values.restaurantColor));
                 </div>
                 <div className="d-flex justify-content-center w-100">
                   <button
+                      disabled={Load || isSubmitting}
                     className="btn bg-gradient-dark mb-0 w-80"
-                    disabled={Load}
+              
                     type="submit"
                   >
                     {Load ? (

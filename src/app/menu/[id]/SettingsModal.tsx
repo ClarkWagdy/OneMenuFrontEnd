@@ -20,9 +20,9 @@ const SettingsModal: FC<Props> = (props: Props) => {
   const Restaurant = useAppSelector((state) => state.Restaurant)
   const User = useAppSelector((state) => state.User)
   const router = useRouter();
-
+ 
   const [Load, setLoad] = useState<boolean>(false);
-  const [ChangeLan, setChangeLan] = useState<boolean>(Restaurant.changeLanguageStatus ? Restaurant.changeLanguageStatus : false);
+  const [ChangeLan, setChangeLan] = useState<boolean>(Restaurant.changeLanguageStatus );
 
   const [Offers, setOffers] = useState<boolean>(Restaurant.offerStatus ? Restaurant.offerStatus : false);
   const [Video, setVideo] = useState<boolean>(Restaurant.videoStatus ? Restaurant.videoStatus : false);
@@ -83,9 +83,9 @@ const SettingsModal: FC<Props> = (props: Props) => {
     formData.append("video", Videofile);
     formData.append("isActive", true);
 
-    axios.post(`${url}/restaurant/edit`, formData, {
+    axios.put(`${url}/restaurant`, formData, {
       headers: {
-        'Authorization': User.token
+        'Authorization': 'Bearer '+ User.token
       }
     }).then(res => {
       setLoad(false)

@@ -17,6 +17,7 @@ export interface CardProps {
   index: number
   categ: CategoryDTO
   moveCard: (dragIndex: number, hoverIndex: number) => void
+  dropCard: (hoverIndex: number) => void
   setLoad: Function
   Load: boolean
   Deletecategory: Function
@@ -45,6 +46,7 @@ export const Card: FC<CardProps> = ({ index, categ, moveCard, setLoad, Load, Del
   setNewCategoryTextAR,
   setNewCategoryTextEN,
   Editcategory,
+  dropCard,
   NewCategoryTextEN,
   NewCategoryTextAR, EditPointer,
   Translation }) => {
@@ -107,16 +109,14 @@ export const Card: FC<CardProps> = ({ index, categ, moveCard, setLoad, Load, Del
     },
   })
 
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemTypes.CARD,
-    item: () => {
-      let ID = categ.id;
-      return { ID, index }
-    },
-    collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  })
+ const [{ isDragging }, drag] = useDrag({
+  type: ItemTypes.CARD,
+  item: () => ({ id: categ.id, index }),
+  end: (item, monitor) => {
+     dropCard(item.index); // fires ONCE, on drop
+  },
+  collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+});
 
   const opacity = isDragging ? 0 : 1
   drag(drop(ref))
@@ -184,7 +184,7 @@ export const Card: FC<CardProps> = ({ index, categ, moveCard, setLoad, Load, Del
   return (
 
     <div ref={ref} style={{ opacity }} data-handler-id={handlerId} key={`${categ.id}-${categ.nameEn}`} className={isDragging ? "" : "animate__animated animate__fadeIn " + classes.Item}>
-      <div className={classes.DragIcon}>
+      <div className={classes.DragIcon} style={{overflow: "hidden"}} >
 
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="20" height="20" x="0" y="0" viewBox="0 0 24 24"  ><g><path fill="#000000" fillRule="evenodd" d="M4 10a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1z" clipRule="evenodd" data-original="#000000"  ></path></g></svg>
         {categ.id != EditPointer ? (_Lan === Languages.AR ? categ.nameAr : categ.nameEn) : ""}
