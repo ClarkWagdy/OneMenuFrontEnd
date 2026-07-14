@@ -22,15 +22,15 @@ import { useAppSelector } from '@/config/Store/hooks';
 import Image from 'next/image';
 import { RestaurantDataDTO } from './types';
 import { set } from 'animejs';
- 
+
 interface Props {
  AddClientModal: {state:boolean,id:string},
     SetAddClientModal: Function,
-  
+
 }
 
 
- const hexToRgb = (hex?: string) => {
+export const hexToRgb = (hex?: string) => {
   if (!hex) return null;
   return {
     r: parseInt(hex.slice(1, 3), 16),
@@ -39,7 +39,7 @@ interface Props {
   };
 };
   export  function rgbToHex(r: string): string {
-  return (
+   return (
     "#" +
     [r.split(',')[0], r.split(',')[1], r.split(',')[2]]
       .map((x) => {
@@ -50,6 +50,22 @@ interface Props {
   );
 }
 
+/**
+ * Normalizes whatever is currently in the color field into a JSON "{r,g,b}"
+ * string ready to send to the API — regardless of whether the value is a
+ * "#rrggbb" hex string (user just picked a new color) or an "r,g,b" string
+ * (untouched value that came straight from RestaurantData on edit).
+ */
+export function normalizeColorForSubmit(color?: string): string {
+  if (!color) return '0,0,0';
+
+  if (color.startsWith('#')) {
+    const rgb = hexToRgb(color);
+    return rgb ? `${rgb.r},${rgb.g},${rgb.b}` : '0,0,0';
+  }
+   // already "r,g,b" (or already-broken JSON from before) — normalize below
+  return color;
+}
 export default function ClientModal(props: Props) {
 const [isSubmitting, setIsSubmitting] = useState(false);
     const [Load, setLoad] = useState<boolean>(false);
@@ -57,7 +73,7 @@ const [isSubmitting, setIsSubmitting] = useState(false);
     const [image, setImage] = useState<any>();
     const [RestaurantData, setRestaurantData] = useState<RestaurantDataDTO>();
 
- 
+
   const User = useAppSelector((state) => state.User);
 
     function onChangeImage(event: any, setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void) {
@@ -140,9 +156,10 @@ useEffect(() => {
             email: RestaurantData?.ownerEmail,
             userName: RestaurantData?.ownerUserName,
             password: "",
+            cpassword: "",
             restaurantName: RestaurantData?.name,
             restaurantLogo: RestaurantData?.logo,
-            restaurantColor: RestaurantData?.color,
+            color: RestaurantData?.color,
           }}
           validationSchema={Yup.object().shape({
             restaurantLogo: Yup.string().required(strings.chooseClientlogo),
@@ -152,25 +169,41 @@ useEffect(() => {
             phoneNumber: Yup.string().required(strings.EnterPhoneNumber),
             userName: Yup.string().required(strings.userName),
             email: Yup.string().email().required(strings.EnterEmailAddress),
-            password: Yup.string()
-              .min(3, strings.TooShort)
-              .max(30, strings.TooLong)
-              .required(strings.Password),
-            cpassword: Yup.string()
-              .oneOf([Yup.ref("password"), ""], strings.Passwordsmustmatch)
-              .required(strings.cPassword),
+            // On create, password is required. On edit, leaving it blank means
+            // "keep the existing password" — only validate if the admin typed one.
+            password: Yup.string().when([], {
+              is: () => !props.AddClientModal.id,
+              then: (schema) =>
+                schema
+                  .min(3, strings.TooShort)
+                  .max(30, strings.TooLong)
+                  .required(strings.Password),
+              otherwise: (schema) =>
+                schema.min(3, strings.TooShort).max(30, strings.TooLong).notRequired(),
+            }),
+            cpassword: Yup.string().when('password', {
+              is: (val: string) => !!val,
+              then: (schema) =>
+                schema
+                  .oneOf([Yup.ref('password'), ''], strings.Passwordsmustmatch)
+                  .required(strings.cPassword),
+              otherwise: (schema) => schema.notRequired(),
+            }),
           })}
           onSubmit={(values, actions) => {
-             if (isSubmitting) return; // hard guard, doesn't wait on React's async state batching
-                setIsSubmitting(true);
-                 setLoad(true);
+            if (isSubmitting) return; // hard guard, doesn't wait on React's async state batching
+            setIsSubmitting(true);
+            setLoad(true);
             console.log(values);
-              // Only include id when editing an existing restaurant
-            if (props.AddClientModal.id) {
-              valuesData.append("id", values.id);
-            }
+
             var valuesData: any = new FormData();
-             valuesData.append("offerStatus", values.offerStatus);
+
+            // Only include id when editing an existing restaurant
+           if (props.AddClientModal.id) {
+  valuesData.append("RestaurantId", values.id);
+}
+
+            valuesData.append("offerStatus", values.offerStatus);
             valuesData.append("videoStatus", values.videoStatus);
             valuesData.append("isActive", values.isActive);
             valuesData.append("name", values.name);
@@ -180,73 +213,76 @@ useEffect(() => {
             valuesData.append("password", values.password);
             valuesData.append("restaurantName", values.restaurantName);
             valuesData.append(
-              "restaurantColor",
- JSON.stringify(hexToRgb(values.restaurantColor))            );
+              "color",
+              normalizeColorForSubmit(values.color)
+            );
             if (image) {
               valuesData.append("restaurantLogo", image);
             } else if (values.restaurantLogo) {
               valuesData.append("restaurantLogo", values.restaurantLogo);
-            }else{
+            } else {
               valuesData.append("restaurantLogo", RestaurantData?.logo);
-
             }
-          
-            if(props.AddClientModal.id){
-              console.log("Editing existing client",valuesData);
-          axios.put(`${url}/restaurant`, valuesData, {
-                headers: {
-                  Authorization: 'Bearer '+ User.token
-                },
-              })
-              .then(function (response) {
-                console.log(response.data);
-                if (response.data.statusCode === 202) {
-                  setDone(true);
-                  setTimeout(() => {
-                    props.SetAddClientModal((prev: any) => {
-                      return { ...prev, state: false, id: "" };
+
+            if (props.AddClientModal.id) {
+              console.log("Editing existing client", valuesData);
+              axios
+                .put(`${url}/restaurant`, valuesData, {
+                  headers: {
+                    Authorization: 'Bearer ' + User.token,
+                  },
+                })
+                .then(function (response) {
+                  console.log(response.data);
+                  if (response.data.statusCode === 202) {
+                    setDone(true);
+                    setTimeout(() => {
+                      props.SetAddClientModal((prev: any) => {
+                        return { ...prev, state: false, id: "" };
+                      });
+                    }, 850);
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                  // handle error
+                  setLoad(false);
+                  setIsSubmitting(false);
+                  if (
+                    error.response?.data?.error?.message
+                      ?.toLowerCase()
+                      .includes("duplicate")
+                  ) {
+                    toast.error(strings.Thisuseralreadyexists, {
+                      position: "bottom-right",
+                      autoClose: 25000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "dark",
                     });
-                  }, 850);
-                }
-              })
-              .catch(function (error) {
-                console.log(error);
-                // handle error
-                setLoad(false);
-                if (
-                  error.response.data.error.message
-                    .toLowerCase()
-                    .includes("duplicate")
-                ) {
-                  toast.error(strings.Thisuseralreadyexists, {
-                    position: "bottom-right",
-                    autoClose: 25000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                  });
-                  actions.resetForm();
-                } else if (error.request.status === 401) {
-                  toast.error(strings.Anerroroccurred, {
-                    position: "bottom-right",
-                    autoClose: 25000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                  });
-                  localStorage.clear();
-                  window.location.replace("/login");
-                }
-              });
+                    actions.resetForm();
+                  } else if (error.request?.status === 401) {
+                    toast.error(strings.Anerroroccurred, {
+                      position: "bottom-right",
+                      autoClose: 25000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "dark",
+                    });
+                    localStorage.clear();
+                    window.location.replace("/login");
+                  }
+                });
               return;
             }
-            axios.post(`${url}/user/owner-restaurant`, valuesData, {
+            axios
+              .post(`${url}/user/owner-restaurant`, valuesData, {
                 headers: {
                   Authorization: User.token,
                 },
@@ -266,9 +302,10 @@ useEffect(() => {
                 console.log(error);
                 // handle error
                 setLoad(false);
+                setIsSubmitting(false);
                 if (
-                  error.response.data.error.message
-                    .toLowerCase()
+                  error.response?.data?.error?.message
+                    ?.toLowerCase()
                     .includes("duplicate")
                 ) {
                   toast.error(strings.Thisuseralreadyexists, {
@@ -282,7 +319,7 @@ useEffect(() => {
                     theme: "dark",
                   });
                   actions.resetForm();
-                } else if (error.request.status === 401) {
+                } else if (error.request?.status === 401) {
                   toast.error(strings.Anerroroccurred, {
                     position: "bottom-right",
                     autoClose: 25000,
@@ -333,7 +370,7 @@ useEffect(() => {
                     <label
                       htmlFor="ItemProduct"
                       style={{
-                        backgroundColor: `rgb(${values.restaurantColor})`,
+                        backgroundColor: `rgb(${values.color})`,
                       }}
                     >
                       {values.restaurantLogo ? (
@@ -467,7 +504,11 @@ useEffect(() => {
                     autoComplete="off"
                     name={"password"}
                     type="password"
-                    placeholder={strings.Password}
+                    placeholder={
+                      props.AddClientModal.id
+                        ? strings.PasswordLeaveBlankToKeep ?? strings.Password
+                        : strings.Password
+                    }
                   />
                   <ErrorMessage
                     className={classes.ErrorMessage}
@@ -491,32 +532,27 @@ useEffect(() => {
                   />
                 </div>
                 <div className="col-12 col-md-6 p-1 d-flex align-items-center justify-content-between">
-                  <label className="m-0 p-0" htmlFor="restaurantColor">
+                  <label className="m-0 p-0" htmlFor="color">
                     {strings.chooseClientcolor}
                   </label>
                   <Field
-                    id="restaurantColor"
+                    id="color"
                     disabled={Load}
                     className={""}
-                 
                     value={
-                      values.restaurantColor
-                        ? values.restaurantColor
-                        : rgbToHex(
-                            values.restaurantColor
-                              ? values.restaurantColor
-                              : "#000000",
-                          )
+                      values.color?.startsWith?.('#')
+                        ? values.color
+                        : rgbToHex(values.color || '0,0,0')
                     }
                     type="color"
-                    name={"restaurantColor"}
+                    name={"color"}
                   />
                 </div>
                 <div className="d-flex justify-content-center w-100">
                   <button
                       disabled={Load || isSubmitting}
                     className="btn bg-gradient-dark mb-0 w-80"
-              
+
                     type="submit"
                   >
                     {Load ? (

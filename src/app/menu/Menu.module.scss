@@ -891,3 +891,170 @@
     }
 
 }
+
+.AddToCartBtn {
+  border: none;
+ background-color: none !important;
+padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 250ms;
+margin: 0;  
+
+}
+
+.QtyStepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  button {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+}
+
+.CartFab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.CartBadge {
+  background: #fff;
+  color: #000;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CartTotalPreview {
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.CartOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1100;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.CartPanel {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.CartPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.CloseBtn {
+  border: none;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.CartItemsList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+}
+
+.CartLineItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.CartItemImg {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.CartItemInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.CartItemName {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.CartItemPrice {
+  font-size: 12px;
+  color: #777;
+}
+
+.RemoveBtn {
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+}
+
+.CartPanelFooter {
+  padding: 16px;
+  border-top: 1px solid #eee;
+}
+
+.CartTotalRow {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.PlaceOrderBtn {
+  width: 100%;
+  border: none;
+  color: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+}

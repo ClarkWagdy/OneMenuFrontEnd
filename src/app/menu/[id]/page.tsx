@@ -28,7 +28,9 @@ import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
 import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut';
 import HeadTag from '@/Component/Head/HeadTag';
-
+import { ClearCart } from "@/config/Store/Cart/CartSlice";
+import CartWidget from './CartWidget';
+import { rgbToHex } from "@/app/dashboard/subscribers/ClientModal/ClientModal";
 // ---------------------------------------------------------------------------
 // Small shared helpers (kept local to this file so nothing else has to change)
 // ---------------------------------------------------------------------------
@@ -47,6 +49,7 @@ function notify(message: string, type: 'success' | 'error' = 'success') {
     theme: 'colored',
   });
 }
+
 
 /** Central place to handle "not authorized" -> logout, instead of repeating it in every catch */
 function handleRequestError(err: any) {
@@ -84,7 +87,27 @@ export default function Page() {
   const hasFetchedRestaurant = useRef(false);
   const hasAutoSelectedCategory = useRef(false);
   const productRequestId = useRef(0); // lets us ignore stale/out-of-order responses
+const Cart = useAppSelector((state) => state.Cart);
+const cartTotal = Cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
+function PlaceOrder() {
+  axios
+    .post(`${url}/order`, {
+      restaurantId: Restaurant.id,
+      tableNumber: '', // or collect from a small modal
+      items: Cart.map((i) => ({
+        productId: i.id,
+        quantity: i.quantity,
+      })),
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        notify(strings.getLanguage() === Languages.AR ? 'تم إرسال الطلب' : 'Order placed');
+        dispatch(ClearCart());
+      }
+    })
+    .catch((err) => handleRequestError(err));
+}
   // --- Fetch the restaurant exactly once -----------------------------------
   useEffect(() => {
     const restaurantId = params?.id as string | undefined;
@@ -312,7 +335,9 @@ export default function Page() {
             <div className={classes.MediaVideosection}>
               <div
                 className={classes.restaurantDetails}
-                style={{ backgroundColor: `rgba(${Restaurant ? Restaurant.color : "63, 63, 63"},0.2)` }}
+                style={{ backgroundColor: `rgba(${Restaurant ? Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"},0.2)` }}
               >
                 <img className={classes.LogoImg} src={Restaurant ? `${RestaurantLogoPath}/${Restaurant.logo}` : ""} alt="" />
               </div>
@@ -365,12 +390,16 @@ export default function Page() {
                       }}
                       style={
                         Categ.id === categoryActive
-                          ? { borderBottomColor: `rgba(${Restaurant ? Restaurant.color : "63, 63, 63"})` }
+                          ? { borderBottomColor: `rgba(${Restaurant ?       Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"})` }
                           : {}
                       }
                       onMouseEnter={(ele) => {
                         if (Categ.id !== categoryActive) {
-                          ele.currentTarget.style.borderBottomColor = `rgba(${Restaurant ? Restaurant.color : "63, 63, 63"})`;
+                          ele.currentTarget.style.borderBottomColor = `rgba(${Restaurant ?       Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"})`;
                         }
                       }}
                       onMouseLeave={(ele) => {
@@ -398,7 +427,9 @@ export default function Page() {
                     className={classes.AddIcon}
                     onClick={() => setCreateOrEditcategoryModal(true)}
                     onMouseEnter={(ele) => {
-                      ele.currentTarget.style.backgroundColor = `rgba(${Restaurant ? Restaurant.color : "63, 63, 63"})`;
+                      ele.currentTarget.style.backgroundColor = `rgba(${Restaurant ?       Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"})`;
                     }}
                     onMouseLeave={(ele) => {
                       ele.currentTarget.style.backgroundColor = "rgba(0, 0, 0,0.9)";
@@ -458,8 +489,12 @@ export default function Page() {
                   style={
                     MenuItems.length > 0
                       ? {
-                          backgroundColor: `rgba(${Restaurant ? Restaurant.color : "63, 63, 63"},0.1)`,
-                          borderColor: `rgba(${Restaurant ? Restaurant.color : "63, 63, 63"})`,
+                          backgroundColor: `rgba(${Restaurant ?       Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"},0.1)`,
+                          borderColor: `rgba(${Restaurant ?       Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"})`,
                         }
                       : {}
                   }
@@ -468,7 +503,9 @@ export default function Page() {
                     <g>
                       <path
                         d="M408 184H272a8 8 0 0 1-8-8V40c0-22.09-17.91-40-40-40s-40 17.91-40 40v136a8 8 0 0 1-8 8H40c-22.09 0-40 17.91-40 40s17.91 40 40 40h136a8 8 0 0 1 8 8v136c0 22.09 17.91 40 40 40s40-17.91 40-40V272a8 8 0 0 1 8-8h136c22.09 0 40-17.91 40-40s-17.91-40-40-40zm0 0"
-                        fill={`rgba(${Restaurant ? Restaurant.color : "63, 63, 63"})`}
+                        fill={`rgba(${Restaurant ?       Restaurant.color ?.startsWith?.('#')
+                        ? Restaurant.color
+                        : rgbToHex(Restaurant.color || '0,0,0'): "63, 63, 63"})`}
                       />
                     </g>
                   </svg>
@@ -497,6 +534,7 @@ export default function Page() {
           setMenuItems={setMenuItems}
         />
         <SettingsModal SettingModal={SettingModal} setSettingModal={setSettingModal} />
+        <CartWidget onPlaceOrder={PlaceOrder} />
 
         <ToastContainer />
 

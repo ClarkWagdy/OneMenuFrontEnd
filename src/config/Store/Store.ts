@@ -8,6 +8,7 @@ import { RestaurantReducer } from './Restaurant/RestaurantSlice'
 import { RestaurantT } from './Restaurant/RestaurantType'
 import { DashboardPagesReducer } from './DashboardPages/DashboardPagesSlice'
 import { NonReadReducer } from './NonRead/NonRead'
+import CartReducer from './Cart/CartSlice';
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     Restaurant: RestaurantReducer,
     DashboardPage: DashboardPagesReducer,
     NonRead: NonReadReducer,
+    Cart: CartReducer,
 
 
   },

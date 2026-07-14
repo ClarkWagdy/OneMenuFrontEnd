@@ -91,4 +91,6 @@ export const en = {
   EmailAddress: "Email",
   EnterEmailAddress: "Enter email",
   Anerroroccurred: "An error occurred",
+  PasswordLeaveBlankToKeep: "Leave blank to keep current password",
+
 };

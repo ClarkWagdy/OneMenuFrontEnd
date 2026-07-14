@@ -93,4 +93,6 @@ export const ar = {
   EmailAddress: "البريد الإلكتروني",
   EnterEmailAddress: "أدخل البريد الإلكتروني",
   Anerroroccurred:"حدث خطأ",
+  PasswordLeaveBlankToKeep: "اتركه فارغًا للاحتفاظ بكلمة المرور الحالية",
+
 };
