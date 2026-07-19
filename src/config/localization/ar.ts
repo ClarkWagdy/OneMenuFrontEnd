@@ -87,7 +87,7 @@ export const ar = {
 
   EnterplaceName: "أدخل اسم المكان",
   EnterClientName: "أدخل اسم العميل",
-
+roles: "الأدوار",
   PhoneNumber: "رقم الهاتف",
   EnterPhoneNumber: "أدخل رقم الهاتف",
   EmailAddress: "البريد الإلكتروني",

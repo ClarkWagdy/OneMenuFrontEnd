@@ -44,9 +44,31 @@ export default function Subscribers() {
     const [PageNumber, setPageNumber] = useState<number>(1);
 
     function HandleChange(e: any,id:string) {
-      
-        console.log(e)
-    }
+             SetLoad(true);
+
+        var formData: any = new FormData();
+
+        formData.append("restaurantId", id);
+         formData.append("isActive", e);
+   axios
+     .put(`${url}/restaurant`, formData, {
+       headers: {
+         Authorization: "Bearer " + User.token,
+       
+       },
+     })
+     .then((res) => {
+       SetLoad(false);
+       console.log(res);
+       if (res.data.statusCode === 202) {
+         window.location.reload();
+       }
+       //props.setSettingModal(false)
+     })
+     .catch((err) => {
+       console.log(err);
+       // props.setSettingModal(false)
+     });    }
 
     async function HandleDownload(name: string, id: string) {
     

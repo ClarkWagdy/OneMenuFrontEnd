@@ -1,5 +1,6 @@
 export const DashboardPages = {
     Home: 1,
     Subscribers: 2,
-    ConnectUs: 3,
+    roles:3,
+    ConnectUs: 4,
 }

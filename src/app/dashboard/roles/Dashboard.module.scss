@@ -1,0 +1,190 @@
+.Dashboard {
+
+  background-color: #3f3f3f;
+  transition: all 250ms;
+  min-height: 100vh;
+
+}
+
+.Dashboard>div {
+  min-height: 100vh;
+}
+
+.ActionList {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 250ms;
+}
+
+.ListOfAction {
+  position: fixed;
+  background-color: rgba(255, 255, 255, 0.2);
+  height: 80% !important;
+  border-radius: 15px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ActionButton {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: all 350ms;
+
+    svg {
+      path {
+        fill: rgba(0, 0, 0, 0.5);
+        transition: all 350ms;
+      }
+    }
+
+    &:hover {
+      transform: scale(1.05);
+
+      svg {
+        path {
+          fill: #3f3f3f;
+        }
+      }
+    }
+  }
+}
+
+.LanBtn {
+  cursor: pointer;
+  border-radius: 25px;
+  padding: 5px;
+  padding-inline: 10px;
+  outline: unset;
+  border: transparent;
+  color: white;
+  font-weight: bold;
+  background-color: transparent !important;
+  transition: all 250ms;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.H100center {
+
+  min-height: calc(100dvh - 74px);
+  display: flex;
+  align-items: center;
+}
+
+.bggray {
+
+  background: rgba($color: #000, $alpha: 0.03);
+
+}
+
+.MEssagenav {
+  position: relative;
+
+  .Messagenum {
+    position: absolute;
+    top: -12px;
+    margin-inline-end: -30px;
+    background-color: tomato;
+    border-radius: 50%;
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    color: white;
+  }
+}
+
+.OVDots {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 150px;
+  height: 1.2em;
+  white-space: nowrap;
+}
+
+.messageCard {
+  padding: 10px;
+
+  .message {
+    background-color: rgba($color: #000000, $alpha: 0.1);
+    border-radius: 25px;
+    padding: 10px;
+  }
+}
+
+.ErrorMessage {
+  line-height: 1px;
+  color: tomato;
+  font-size: 11px;
+
+}
+
+.AddItemImageForm {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+
+}
+
+.AddItemImageForm label {
+  position: absolute;
+
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-end: 10px;
+  bottom: 5px;
+  -webkit-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+  transition: all 250ms;
+
+}
+
+.AddItemImageForm label svg path {
+  fill: white;
+}
+
+.AddItemImageForm label:hover {
+  transform: scale(1.1);
+
+}
+
+
+.AddItemImageForm input {
+  display: none;
+}
+
+.AddItemImageForm img {
+  width: 250px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 15px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.DoneImage{
+  position: absolute;
+  width: 100%;
+  right: 0;
+  left: 0;
+  top: 0;
+  height: 100%;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 11px;
+}

@@ -43,8 +43,10 @@ export default function Navbar(props: Props) {
               {props.CurrentPage === DashboardPages.Home
                 ? strings.Dashboard
                 : props.CurrentPage === DashboardPages.Subscribers
-                ? strings.Subscribers
-                : ""}
+                  ? strings.Subscribers
+                  : props.CurrentPage === DashboardPages.roles
+                    ? strings.roles
+                    : ""}
             </h6>
           </nav>
           <div

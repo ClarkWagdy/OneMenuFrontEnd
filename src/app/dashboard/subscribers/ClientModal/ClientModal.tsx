@@ -225,7 +225,6 @@ useEffect(() => {
             }
 
             if (props.AddClientModal.id) {
-              console.log("Editing existing client", valuesData);
               axios
                 .put(`${url}/restaurant`, valuesData, {
                   headers: {

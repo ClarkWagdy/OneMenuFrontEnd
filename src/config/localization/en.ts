@@ -85,7 +85,7 @@ export const en = {
   placeName: "Place name",
   EnterClientName: "Enter client name",
   EnterplaceName: "Enter place name",
-
+roles: "Roles",
   PhoneNumber: "Phone number",
   EnterPhoneNumber: "Enter phone number",
   EmailAddress: "Email",
