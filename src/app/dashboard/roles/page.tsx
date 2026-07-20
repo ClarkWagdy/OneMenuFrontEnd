@@ -1,99 +1,65 @@
 "use client";
-import { RestaurantLogoPath, url } from "@/config/Api/url";
+import { url } from "@/config/Api/url";
 import { HandleLogOut } from "@/config/HandleLogOut/HandleLogOut";
 import { strings } from "@/config/localization/LocalizedStrings";
 import { useAppDispatch, useAppSelector } from "@/config/Store/hooks";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import classes from "../Dashboard.module.scss";
-import { ResturantT } from "../Type";
 // @ts-ignore
 const Switch = require("react-switch").default;
 import NoItems from "@/Component/NoItems/NoItems";
 import Loading from "@/Component/Loading/Loading";
-import { useQRCode } from "next-qrcode";
-import { saveAs } from "file-saver";
-import { onWrite } from "@/config/NFC/NFCFunction";
-import Modal from "react-bootstrap/Modal";
 import HeadTag from "@/Component/Head/HeadTag";
 import Sidebar from "../Sidebar";
 import { toggleSidenav } from "@/config/toggleSide/toggleSidenav";
 import { Languages } from "@/config/localization/Languages";
 import Navbar from "../Navbar";
-import ClientModal from "./ClientModal/ClientModal";
-import { normalizeColorForSubmit } from "./ClientModal/ClientModal";
 import Authenticating from "@/config/Authenticating/Authenticating";
-import QRCode from "qrcode";
 
-export default function Subscribers() {
+// Matches the backend UserListDTO
+interface UserListItem {
+  id: string;
+  userName: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  isActive: boolean;
+  roles: string[];
+  restaurantId?: string | null;
+  creationTime: string;
+}
+
+export default function AllUsers() {
   Authenticating();
   const dispatch = useAppDispatch();
 
-  const { Canvas } = useQRCode();
-  const [ResturantList, setResturantList] = useState<ResturantT[]>([]);
   const User = useAppSelector((state) => state.User);
+  const [UserList, setUserList] = useState<UserListItem[]>([]);
   const [Name, setName] = useState<string>("");
+  const [RoleFilter, setRoleFilter] = useState<string>("");
   const [Load, SetLoad] = useState<boolean>(true);
   const [Count, setCount] = useState<number>(25);
-  const [write, Setwrite] = useState<boolean>(false);
-  const [done, Setdone] = useState<boolean>(false);
-
-  const [AddClientModal, SetAddClientModal] = useState<{
-    state: boolean;
-    id: string;
-  }>({ state: false, id: "" });
-  const [ResID, SetResID] = useState<string>("");
-
   const [PageNumber, setPageNumber] = useState<number>(1);
+  const [Refresh, SetRefresh] = useState<boolean>(false);
 
-  // The backend PUT /restaurant endpoint expects the FULL restaurant
-  // object on every update (it's not a partial patch). So toggling
-  // isActive can't just send {restaurantId, isActive} — that would
-  // wipe out every other field. Instead we fetch the current full
-  // record first, flip isActive, and resend everything, mirroring
-  // exactly what ClientModal does on a normal edit-save.
-  function HandleChange(newActiveState: boolean, id: string) {
+  // Toggle isActive for a user. Adjust the endpoint/method to match
+  // whatever route you exposed on the backend for this — this assumes
+  // POST /user/toggle-active/{id}. Swap it out if yours differs.
+  function HandleToggleActive(newActiveState: boolean, id: string) {
     SetLoad(true);
-
     axios
-      .get(`${url}/restaurant/for-edit-by-id/${id}`, {
-        headers: {
-          Authorization: User.token,
-        },
-      })
-      .then((res) => {
-        const data = res.data.data ?? res.data;
-
-        const formData: any = new FormData();
-        // Match the casing ClientModal uses on edit ("RestaurantId"),
-        // so both flows agree on the same field name.
-        formData.append("RestaurantId", id);
-        formData.append("offerStatus", data.offerStatus ?? false);
-        formData.append("videoStatus", data.videoStatus ?? false);
-        formData.append("isActive", newActiveState);
-        formData.append("name", data.ownerName ?? "");
-        formData.append("phoneNumber", data.ownerPhoneNumber ?? "");
-        formData.append("email", data.ownerEmail ?? "");
-        formData.append("userName", data.ownerUserName ?? "");
-        // Blank password tells the backend to keep the existing one,
-        // same convention used in ClientModal's edit submit.
-        formData.append("password", "");
-        formData.append("restaurantName", data.name ?? "");
-        formData.append("restaurantLogo", data.logo ?? "");
-        formData.append("color", normalizeColorForSubmit(data.color));
-
-        return axios.put(`${url}/restaurant`, formData, {
+      .put(
+        `${url}/user/user/${id}`,
+        {isActive: newActiveState},
+        {
           headers: {
             Authorization: "Bearer " + User.token,
           },
-        });
-      })
-      .then((res) => {
-        SetLoad(false);
-        console.log(res);
-        if (res.data.statusCode === 202) {
-          window.location.reload();
-        }
+        },
+      )
+      .then(() => {
+        SetRefresh((prev) => !prev);
       })
       .catch((err) => {
         console.log(err);
@@ -101,72 +67,34 @@ export default function Subscribers() {
       });
   }
 
-  async function HandleDownload(name: string, id: string) {
-    try {
-      const text = `${window.location.host}/menu/${id}`; // replace with dynamic data
-      const qrDataUrl = await QRCode.toDataURL(text, { width: 1400 });
-
-      // auto download
-      const link = document.createElement("a");
-      link.href = qrDataUrl;
-      link.download = `${name}.png`;
-      link.click();
-    } catch (err) {
-      console.error(err);
-    }
-  }
   useEffect(() => {
+    SetLoad(true);
     axios
       .get(
-        `${url}/restaurant?${
-          Name ? `Name=${Name}&` : ""
-        }Count=${Count}&PageNumber=${PageNumber}`,
+        `${url}/user/users?${Name ? `Filter=${Name}&` : ""}${
+          RoleFilter ? `Role=${RoleFilter}&` : ""
+        }MaxResultCount=${Count}&SkipCount=${(PageNumber - 1) * Count}`,
         {
           headers: {
-            Authorization: User.token,
+            Authorization: "Bearer " + User.token,
           },
         },
       )
       .then(function (response) {
         if (response.status === 200) {
-          setResturantList(response.data.data);
+          // PagedResultDto shape: { items: [...], totalCount }
+          setUserList(response.data.items ?? response.data.data ?? []);
         }
         SetLoad(false);
       })
       .catch(function (error) {
-        // handle error
         SetLoad(false);
-        if (error.request.status) {
+        if (error?.request?.status) {
           HandleLogOut(dispatch);
         }
       });
-  }, [AddClientModal]);
+  }, [Name, RoleFilter, PageNumber, Count, Refresh]);
 
-  // const onWrite = () => {
-  //     try {
-  //         if ('NDEFReader' in window) {
-  //             const ndef = new window.NDEFReader();
-  //             await ndef.write({
-  //                 records: [{ recordType: "text", data: "Hellow World!" }],
-  //             });
-  //             console.log(`Value Saved!`);
-  //         }
-
-  //     } catch (error) {
-  //         console.log(error);
-  //     }
-  // };
-
-  async function Handlewrite(url: string) {
-    Setwrite(true);
-    let data = await onWrite(url);
-    if (data) {
-      Setdone(true);
-      setTimeout(() => {
-        Setwrite(false);
-      }, 1000);
-    }
-  }
   return (
     <>
       <HeadTag
@@ -193,47 +121,12 @@ export default function Subscribers() {
             <div className={"container-fluid py-4  "}>
               <div className="row">
                 <div className="col-12 mb-3">
-                  <div
-                    className={
-                      "card  flex-row justify-content-between px-3 py-2"
-                    }
-                  >
-                    <div>
-                      <h6 className="p-0 m-0">{strings.roles}</h6>
-                      <p className="text-sm p-0 m-0 ">
-                        {strings.Allsubscribedcustomers}
-                      </p>
-                    </div>
-
-                    <button
-                      className="btn bg-gradient-dark mb-0"
-                      onClick={() =>
-                        SetAddClientModal((prev) => {
-                          return { ...prev, state: true, id: "" };
-                        })
-                      }
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        version="1.1"
-                        width="15"
-                        height="15"
-                        x="0"
-                        y="0"
-                        viewBox="0 0 448 448"
-                      >
-                        <g>
-                          <path
-                            d="M408 184H272a8 8 0 0 1-8-8V40c0-22.09-17.91-40-40-40s-40 17.91-40 40v136a8 8 0 0 1-8 8H40c-22.09 0-40 17.91-40 40s17.91 40 40 40h136a8 8 0 0 1 8 8v136c0 22.09 17.91 40 40 40s40-17.91 40-40V272a8 8 0 0 1 8-8h136c22.09 0 40-17.91 40-40s-17.91-40-40-40zm0 0"
-                            fill="#fff"
-                            opacity="1"
-                            data-original="#000000"
-                          ></path>
-                        </g>
-                      </svg>
-                      &nbsp;&nbsp;&nbsp;
-                      {strings.AddNewClient}
-                    </button>
+                  <div className={"card px-3 py-2"}>
+                    <h6 className="p-0 m-0">All Users</h6>
+                    <p className="text-sm p-0 m-0 ">
+                      All accounts across the system — owners, waiters,
+                      kitchen staff
+                    </p>
                   </div>
                 </div>
 
@@ -241,11 +134,21 @@ export default function Subscribers() {
                   <div className={Load ? "card m-0 min-h-40vh" : "card m-0"}>
                     {Load ? (
                       <Loading Card />
-                    ) : ResturantList && ResturantList.length > 0 ? (
+                    ) : UserList && UserList.length > 0 ? (
                       <>
-                        <div className="card-header d-flex align-items-center justify-content-between pb-0">
-                          <h6>{strings.roles}</h6>
-                          <div className=" d-flex align-items-center">
+                        <div className="card-header d-flex align-items-center justify-content-between pb-0 flex-wrap gap-2">
+                          <h6>All Users</h6>
+                          <div className="d-flex align-items-center gap-2">
+                            <select
+                              className="form-control"
+                              value={RoleFilter}
+                              onChange={(e) => setRoleFilter(e.target.value)}
+                            >
+                              <option value="">All Roles</option>
+                              <option value="Owner">Owner</option>
+                              <option value="Waiter">Waiter</option>
+                              <option value="KitchenMan">Kitchen</option>
+                            </select>
                             <div className="input-group">
                               <span className="input-group-text text-body">
                                 <svg
@@ -253,16 +156,12 @@ export default function Subscribers() {
                                   version="1.1"
                                   width="15"
                                   height="15"
-                                  x="0"
-                                  y="0"
                                   viewBox="0 0 461.516 461.516"
                                 >
                                   <g>
                                     <path
                                       d="M185.746 371.332a185.294 185.294 0 0 0 113.866-39.11L422.39 455c9.172 8.858 23.787 8.604 32.645-.568 8.641-8.947 8.641-23.131 0-32.077L332.257 299.577c62.899-80.968 48.252-197.595-32.716-260.494S101.947-9.169 39.048 71.799-9.204 269.394 71.764 332.293a185.64 185.64 0 0 0 113.982 39.039zM87.095 87.059c54.484-54.485 142.82-54.486 197.305-.002s54.486 142.82.002 197.305-142.82 54.486-197.305.002l-.002-.002c-54.484-54.087-54.805-142.101-.718-196.585l.718-.718z"
                                       fill="#000000"
-                                      opacity="1"
-                                      data-original="#000000"
                                     ></path>
                                   </g>
                                 </svg>
@@ -283,204 +182,74 @@ export default function Subscribers() {
                               <thead>
                                 <tr>
                                   <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    {strings.PlaceName}
+                                    User
                                   </th>
-
-                                  <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    {strings.Status}
+                                  <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Role
                                   </th>
-                                  <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    QR
-                                  </th>
-                                  <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Link
+                                  <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Phone
                                   </th>
                                   <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                    Write NfC
+                                    Status
                                   </th>
-
                                   <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                     {strings.subscriptiontime}
                                   </th>
-                                  <th className="text-secondary opacity-7"></th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {ResturantList.map((ele) => {
-                                  return (
-                                    <tr key={ele.id}>
-                                      <td>
-                                        <div className="d-flex px-2 py-1">
-                                          <div>
-                                            <img
-                                              src={`${RestaurantLogoPath}/${ele.logo}`}
-                                              className="avatar avatar-sm me-3"
-                                              alt="user1"
-                                            />
-                                          </div>
-                                          <div className="d-flex flex-column justify-content-center">
-                                            <h6 className="mb-0 text-sm">
-                                              {ele.name}
-                                            </h6>
-                                            <p className="text-xs text-secondary mb-0">
-                                              {ele.ownerEmail}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </td>
-
-                                      <td className="align-middle text-center text-sm">
-                                        <Switch
-                                          onChange={(e: any) => {
-                                            HandleChange(e, ele.id);
-                                          }}
-                                          checked={ele.isActive ? true : false}
-                                          onColor="#68B984"
-                                          onHandleColor="#68B984"
-                                          handleDiameter={30}
-                                          uncheckedIcon={false}
-                                          checkedIcon={false}
-                                          boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                          activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                          height={20}
-                                          width={48}
-                                        />
-                                      </td>
-
-                                      <td
-                                        id={ele.id}
-                                        className="  qr d-flex align-items-center justify-content-center"
-                                      >
-                                        <Canvas
-                                          text={`${window.location.host}/menu/${ele.id}`}
-                                          options={{
-                                            type: "image/jpeg",
-
-                                            quality: 0.1,
-                                            errorCorrectionLevel: "H",
-                                            margin: 3,
-                                            scale: 1,
-                                            width: 80,
-                                            color: {
-                                              dark: "#3f3f3f",
-                                              light: "#fff",
-                                            },
-                                          }}
-                                        />
-                                        <button
-                                          className={"btn p-0 m-0 mx-2 p-1"}
-                                          onClick={() =>
-                                            HandleDownload(ele.name, ele.id)
-                                          }
+                                {UserList.map((u) => (
+                                  <tr key={u.id}>
+                                    <td>
+                                      <div className="d-flex flex-column px-2 py-1">
+                                        <h6 className="mb-0 text-sm">
+                                          {u.fullName || u.userName}
+                                        </h6>
+                                        <p className="text-xs text-secondary mb-0">
+                                          {u.email}
+                                        </p>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      {u.roles.map((r) => (
+                                        <span
+                                          key={r}
+                                          className="badge badge-sm bg-gradient-secondary me-1"
                                         >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            version="1.1"
-                                            width="20"
-                                            height="20"
-                                            x="0"
-                                            y="0"
-                                            viewBox="0 0 515.283 515.283"
-                                          >
-                                            <g>
-                                              <path
-                                                d="M400.775 515.283H114.507c-30.584 0-59.339-11.911-80.968-33.54C11.911 460.117 0 431.361 0 400.775v-28.628c0-15.811 12.816-28.628 28.627-28.628s28.627 12.817 28.627 28.628v28.628c0 15.293 5.956 29.67 16.768 40.483 10.815 10.814 25.192 16.771 40.485 16.771h286.268c15.292 0 29.669-5.957 40.483-16.771 10.814-10.815 16.771-25.192 16.771-40.483v-28.628c0-15.811 12.816-28.628 28.626-28.628s28.628 12.817 28.628 28.628v28.628c0 30.584-11.911 59.338-33.54 80.968-21.629 21.629-50.384 33.54-80.968 33.54zM257.641 400.774a28.538 28.538 0 0 1-19.998-8.142l-.002-.002-.057-.056-.016-.016c-.016-.014-.03-.029-.045-.044l-.029-.029a.892.892 0 0 0-.032-.031l-.062-.062-114.508-114.509c-11.179-11.179-11.179-29.305 0-40.485 11.179-11.179 29.306-11.18 40.485 0l65.638 65.638V28.627C229.014 12.816 241.83 0 257.641 0s28.628 12.816 28.628 28.627v274.408l65.637-65.637c11.178-11.179 29.307-11.179 40.485 0 11.179 11.179 11.179 29.306 0 40.485L277.883 392.39l-.062.062-.032.031-.029.029c-.014.016-.03.03-.044.044l-.017.016a1.479 1.479 0 0 1-.056.056l-.002.002c-.315.307-.634.605-.96.895a28.441 28.441 0 0 1-7.89 4.995l-.028.012c-.011.004-.02.01-.031.013a28.5 28.5 0 0 1-11.091 2.229z"
-                                                fill="#3f3f3f"
-                                                opacity="1"
-                                                data-original="#3f3f3f"
-                                              ></path>
-                                            </g>
-                                          </svg>
-                                        </button>
-                                      </td>
-                                      <td className="align-middle text-center text-sm">
-                                        <a
-                                          href={`${window.location.host}/menu/${ele.id}`}
-                                          target="_blank"
-                                        >
-                                          Link
-                                        </a>
-                                      </td>
-                                      <td className="text-center">
-                                        <button
-                                          className="btn p-0 m-0 p-2"
-                                          onClick={() =>
-                                            Handlewrite(
-                                              `${window.location.host}/menu/${ele.id}`,
-                                            )
-                                          }
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            version="1.1"
-                                            width="25"
-                                            height="25"
-                                            x="0"
-                                            y="0"
-                                            viewBox="0 0 512 512"
-                                          >
-                                            <g>
-                                              <path
-                                                d="M504.5 316.61H310.55M504.5 346.91H310.55M390.02 124.68h-79.47M355.02 387.32h-44.47M425.02 124.68h59.28c11.16 0 20.2 9.04 20.2 20.2v222.24c0 11.16-9.04 20.2-20.2 20.2h-94.28M383.28 175.187h20.204M433.789 165.085l-20.204 60.61M464.094 215.593H443.89M7.5 142.18v321.91c0 22.32 18.09 40.41 40.41 40.41h222.23c22.32 0 40.41-18.09 40.41-40.41V47.91c0-22.32-18.09-40.41-40.41-40.41H47.91C25.59 7.5 7.5 25.59 7.5 47.91v59.27M138.821 37.805h40.407"
-                                                fill="none"
-                                                stroke="#000000"
-                                                strokeWidth="15"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeMiterlimit="10"
-                                                data-original="#000000"
-                                              ></path>
-                                              <path
-                                                d="M103.465 147.022c61.271 0 111.118 49.847 111.118 111.118"
-                                                fill="none"
-                                                stroke="#000000"
-                                                strokeWidth="15"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeMiterlimit="10"
-                                                data-original="#000000"
-                                              ></path>
-                                              <path
-                                                d="M103.465 177.327c44.561 0 80.813 36.252 80.813 80.813M103.465 207.631c27.851 0 50.508 22.658 50.508 50.508M103.465 237.936c11.158 0 20.203 9.045 20.203 20.203M73.533 364.978v-60.496l42.472 60.496v-60.609M170.875 304.369H146.31v60.609M146.31 334.099h22.614M242.368 309.544a30.161 30.161 0 0 0-16.944-5.176c-16.737 0-30.305 13.568-30.305 30.305 0 16.737 13.568 30.305 30.305 30.305 6.797 0 12.389-2.238 16.632-6.017a24.386 24.386 0 0 0 2.46-2.538"
-                                                fill="none"
-                                                stroke="#000000"
-                                                strokeWidth="15"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeMiterlimit="10"
-                                                data-original="#000000"
-                                              ></path>
-                                            </g>
-                                          </svg>{" "}
-                                        </button>
-                                      </td>
-                                      <td className="align-middle text-center">
-                                        <span className="text-secondary text-xs font-weight-bold">
-                                          {new Date(ele.creationTime)
-                                            .toISOString()
-                                            .slice(0, 10)}
+                                          {r}
                                         </span>
-                                      </td>
-                                      <td className="align-middle">
-                                        <button
-                                          className=" btn p-0 m-0 p-2 text-secondary font-weight-bold text-xs"
-                                          data-toggle="tooltip"
-                                          data-original-title="Edit user"
-                                          onClick={() => {
-                                            SetAddClientModal((prev) => {
-                                              return {
-                                                state: true,
-                                                id: ele.id,
-                                              };
-                                            });
-                                          }}
-                                        >
-                                          Edit
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
+                                      ))}
+                                    </td>
+                                    <td className="text-sm">
+                                      {u.phoneNumber}
+                                    </td>
+                                    <td className="align-middle text-center text-sm">
+                                      <Switch
+                                        onChange={(checked: boolean) =>
+                                          HandleToggleActive(checked, u.id)
+                                        }
+                                        checked={!!u.isActive}
+                                        onColor="#68B984"
+                                        onHandleColor="#68B984"
+                                        handleDiameter={30}
+                                        uncheckedIcon={false}
+                                        checkedIcon={false}
+                                        boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                        activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                        height={20}
+                                        width={48}
+                                      />
+                                    </td>
+                                    <td className="align-middle text-center">
+                                      <span className="text-secondary text-xs font-weight-bold">
+                                        {new Date(u.creationTime)
+                                          .toISOString()
+                                          .slice(0, 10)}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
                               </tbody>
                             </table>
                           </div>
@@ -493,50 +262,6 @@ export default function Subscribers() {
                 </div>
               </div>
             </div>
-            <Modal show={write} centered>
-              <div className="modalNfc flex-column">
-                <div className="d-flex w-100 justify-content-end p-3">
-                  <span
-                    style={{ cursor: "pointer" }}
-                    onClick={() => Setwrite(false)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      version="1.1"
-                      width="15"
-                      height="15"
-                      x="0"
-                      y="0"
-                      viewBox="0 0 320.591 320.591"
-                    >
-                      <g>
-                        <path
-                          d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"
-                          fill="#000000"
-                          data-original="#000000"
-                        ></path>
-                        <path
-                          d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z"
-                          fill="#000000"
-                          data-original="#000000"
-                        ></path>
-                      </g>
-                    </svg>
-                  </span>
-                </div>
-
-                {done ? (
-                  <img src="/done.gif" alt="" />
-                ) : (
-                  <img src="/nfc.gif" alt="" />
-                )}
-              </div>
-            </Modal>
-
-            <ClientModal
-              AddClientModal={AddClientModal}
-              SetAddClientModal={SetAddClientModal}
-            />
           </div>
         </main>
       </section>
