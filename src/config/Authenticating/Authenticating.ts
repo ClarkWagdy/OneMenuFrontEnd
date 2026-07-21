@@ -15,6 +15,13 @@ export default function Authenticating() {
       ) {
         redirect("/dashboard");
         // return;
+      }
+      else if (
+    
+        userdata.type === UserEnum.KitchenMan &&
+         !window.location.href.includes("kitchen")
+       ) {
+        redirect(`/kitchen`);
       } else if (
     
         userdata.type === UserEnum.Owner &&

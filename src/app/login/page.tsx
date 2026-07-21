@@ -103,11 +103,22 @@ export default function Login() {
                 if (response.data.statusCode === 200 || response.data.statusCode === 202) {
                   var user: UserT = { ...response.data.data.user };
 
-                  console.log(response.data, user?.type === UserEnum.Owner);
+                  // console.log(response.data, user?.type  );
                   if (user?.type === UserEnum.Admin) {
                     dispatch(SetUser(user));
                     redirect(`/dashboard`);
-                  } else if (user?.type === UserEnum.Owner) {
+                  }else if (user?.type === UserEnum.KitchenMan) {
+                    var restaurant: RestaurantT = {
+                      ...response.data.data.restaurant,
+                    };
+
+                    user.RestaurantId = restaurant.id;
+                    dispatch(SetUser(user));
+                    dispatch(SetRestaurant(restaurant));
+                    // console.log("redirecting to kitchen page for restaurant:", restaurant.id);
+                    redirect(`/kitchen`);
+                  }
+                   else if (user?.type === UserEnum.Owner) {
                     var restaurant: RestaurantT = {
                       ...response.data.data.restaurant,
                     };

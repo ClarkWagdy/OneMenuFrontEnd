@@ -30,6 +30,40 @@ interface UserListItem {
   creationTime: string;
 }
 
+interface RestaurantListItem {
+  id: string;
+  name: string;
+}
+
+const AVAILABLE_ROLES = ["User", "Owner", "Admin", "Waiter", "KitchenMan"];
+
+// Roles that require a restaurant to be attached to the user.
+const ROLES_REQUIRING_RESTAURANT = ["Owner", "Waiter", "KitchenMan"];
+
+// Shape of the add/edit form. `password` is only sent when creating a user
+// (and only if the person typed one while editing, in case you want to
+// support optional password resets from this same form).
+interface UserFormState {
+  id?: string;
+  userName: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  roles: string[];
+  restaurantId?: string | null;
+}
+
+const EMPTY_FORM: UserFormState = {
+  userName: "",
+  fullName: "",
+  email: "",
+  phoneNumber: "",
+  password: "",
+  roles: [],
+  restaurantId: null,
+};
+
 export default function AllUsers() {
   Authenticating();
   const dispatch = useAppDispatch();
@@ -43,15 +77,151 @@ export default function AllUsers() {
   const [PageNumber, setPageNumber] = useState<number>(1);
   const [Refresh, SetRefresh] = useState<boolean>(false);
 
-  // Toggle isActive for a user. Adjust the endpoint/method to match
-  // whatever route you exposed on the backend for this — this assumes
-  // POST /user/toggle-active/{id}. Swap it out if yours differs.
+  // ----- Add / Edit modal state -----
+  const [ShowModal, setShowModal] = useState<boolean>(false);
+  const [ModalMode, setModalMode] = useState<"add" | "edit">("add");
+  const [Form, setForm] = useState<UserFormState>(EMPTY_FORM);
+  const [Saving, setSaving] = useState<boolean>(false);
+  const [FormError, setFormError] = useState<string>("");
+  const [RestaurantList, setRestaurantList] = useState<RestaurantListItem[]>(
+    [],
+  );
+
+  // Whether the currently selected role(s) require a restaurant to be picked
+  const NeedsRestaurant = Form.roles.some((r) =>
+    ROLES_REQUIRING_RESTAURANT.includes(r),
+  );
+
+  // Load once — used to populate the restaurant picker in the add/edit modal.
+  useEffect(() => {
+    axios
+      .get(`${url}/restaurant?MaxResultCount=1000`, {
+        headers: { Authorization: "Bearer " + User.token },
+      })
+      .then((response) => {
+        setRestaurantList(response.data.items ?? response.data.data ?? []);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function OpenAddModal() {
+    setModalMode("add");
+    setForm(EMPTY_FORM);
+    setFormError("");
+    setShowModal(true);
+  }
+
+  function OpenEditModal(u: UserListItem) {
+    setModalMode("edit");
+    setForm({
+      id: u.id,
+      userName: u.userName,
+      fullName: u.fullName,
+      email: u.email,
+      phoneNumber: u.phoneNumber,
+      password: "",
+      roles: u.roles ?? [],
+      restaurantId: u.restaurantId ?? null,
+    });
+    setFormError("");
+    setShowModal(true);
+  }
+
+  function CloseModal() {
+    if (Saving) return;
+    setShowModal(false);
+  }
+
+  // Roles render as radio buttons, so this is effectively single-select:
+  // picking a role replaces whatever was picked before. If the new role
+  // doesn't need a restaurant, the previously chosen restaurant is cleared.
+  function HandleRoleSelect(role: string) {
+    setForm((prev) => ({
+      ...prev,
+      roles: [role],
+      restaurantId: ROLES_REQUIRING_RESTAURANT.includes(role)
+        ? prev.restaurantId
+        : null,
+    }));
+  }
+
+  function HandleFormChange(field: keyof UserFormState, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function ValidateForm(): string {
+    if (!Form.userName.trim()) return "Username is required.";
+    if (!Form.fullName.trim()) return "Full name is required.";
+    if (!Form.email.trim()) return "Email is required.";
+    if (ModalMode === "add" && !Form.password.trim())
+      return "Password is required for new users.";
+    if (Form.roles.length === 0) return "Select a role.";
+    if (NeedsRestaurant && !Form.restaurantId)
+      return "Select a restaurant for this role.";
+    return "";
+  }
+
+  function HandleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const error = ValidateForm();
+    if (error) {
+      setFormError(error);
+      return;
+    }
+    setFormError("");
+    setSaving(true);
+
+    const payload: Partial<UserFormState> = {
+      userName: Form.userName,
+      fullName: Form.fullName,
+      email: Form.email,
+      phoneNumber: Form.phoneNumber,
+      roles: Form.roles,
+      restaurantId: NeedsRestaurant ? Form.restaurantId : null,
+    };
+
+    // Only include password when it's set (required on add, optional on edit)
+    if (Form.password.trim()) {
+      payload.password = Form.password;
+    }
+
+    const request =
+      ModalMode === "add"
+        ? axios.post(`${url}/user/user`, payload, {
+            headers: { Authorization: "Bearer " + User.token },
+          })
+        : axios.put(
+            `${url}/user/user`,
+            { ...payload, id: Form.id },
+            { headers: { Authorization: "Bearer " + User.token } },
+          );
+
+    request
+      .then(() => {
+        setSaving(false);
+        setShowModal(false);
+        SetRefresh((prev) => !prev);
+      })
+      .catch((err) => {
+        console.log(err);
+        setSaving(false);
+        setFormError(
+          err?.response?.data?.error?.message ||
+            "Something went wrong while saving. Please try again.",
+        );
+      });
+  }
+
+  // Toggle isActive for a user.
   function HandleToggleActive(newActiveState: boolean, id: string) {
     SetLoad(true);
     axios
       .put(
-        `${url}/user/user/${id}`,
-        {isActive: newActiveState},
+        `${url}/user/user`,
+        { id: id, isActive: newActiveState },
         {
           headers: {
             Authorization: "Bearer " + User.token,
@@ -121,12 +291,25 @@ export default function AllUsers() {
             <div className={"container-fluid py-4  "}>
               <div className="row">
                 <div className="col-12 mb-3">
-                  <div className={"card px-3 py-2"}>
-                    <h6 className="p-0 m-0">All Users</h6>
-                    <p className="text-sm p-0 m-0 ">
-                      All accounts across the system — owners, waiters,
-                      kitchen staff
-                    </p>
+                  <div
+                    className={
+                      "card px-3 py-2 d-flex flex-row align-items-center justify-content-between flex-wrap gap-2"
+                    }
+                  >
+                    <div>
+                      <h6 className="p-0 m-0">All Users</h6>
+                      <p className="text-sm p-0 m-0 ">
+                        All accounts across the system — owners, waiters,
+                        kitchen staff
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn bg-gradient-dark m-0"
+                      onClick={OpenAddModal}
+                    >
+                      + Add User
+                    </button>
                   </div>
                 </div>
 
@@ -196,6 +379,9 @@ export default function AllUsers() {
                                   <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                     {strings.subscriptiontime}
                                   </th>
+                                  <th className="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                    Edit
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -248,6 +434,29 @@ export default function AllUsers() {
                                           .slice(0, 10)}
                                       </span>
                                     </td>
+                                    <td className="align-middle text-center">
+                                      <button
+                                        type="button"
+                                        className="btn btn-link text-dark px-2 mb-0"
+                                        title="Edit user"
+                                        onClick={() => OpenEditModal(u)}
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="16"
+                                          height="16"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        >
+                                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                      </button>
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -265,6 +474,187 @@ export default function AllUsers() {
           </div>
         </main>
       </section>
+
+      {ShowModal && (
+        <div
+          className="modal d-block"
+          tabIndex={-1}
+          role="dialog"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={CloseModal}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <form onSubmit={HandleSubmit}>
+                <div className="modal-header">
+                  <h6 className="modal-title m-0">
+                    {ModalMode === "add" ? "Add New User" : "Edit User"}
+                  </h6>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Close"
+                    onClick={CloseModal}
+                  ></button>
+                </div>
+
+                <div className="modal-body">
+                  {FormError && (
+                    <div className="alert alert-danger py-2 text-sm">
+                      {FormError}
+                    </div>
+                  )}
+
+                  <div className="mb-3">
+                    <label className="form-label text-sm">Username</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={Form.userName}
+                      onChange={(e) =>
+                        HandleFormChange("userName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label text-sm">Full Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={Form.fullName}
+                      onChange={(e) =>
+                        HandleFormChange("fullName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label text-sm">Email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      value={Form.email}
+                      onChange={(e) =>
+                        HandleFormChange("email", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label text-sm">
+                      Phone Number
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={Form.phoneNumber}
+                      onChange={(e) =>
+                        HandleFormChange("phoneNumber", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label text-sm">
+                      {ModalMode === "add"
+                        ? "Password"
+                        : "New Password (optional)"}
+                    </label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      value={Form.password}
+                      onChange={(e) =>
+                        HandleFormChange("password", e.target.value)
+                      }
+                      placeholder={
+                        ModalMode === "edit"
+                          ? "Leave blank to keep current"
+                          : ""
+                      }
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label text-sm d-block">
+                      Role
+                    </label>
+                    <div className="d-flex gap-3 flex-wrap">
+                      {AVAILABLE_ROLES.map((role) => (
+                        <div className="form-check" key={role}>
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="user-role"
+                            id={`role-${role}`}
+                            checked={Form.roles.includes(role)}
+                            onChange={() => HandleRoleSelect(role)}
+                          />
+                          <label
+                            className="form-check-label text-sm"
+                            htmlFor={`role-${role}`}
+                          >
+                            {role}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {NeedsRestaurant && (
+                    <div className="mb-1 mt-3">
+                      <label className="form-label text-sm">
+                        Restaurant
+                      </label>
+                      <select
+                        className="form-control"
+                        value={Form.restaurantId ?? ""}
+                        onChange={(e) =>
+                          HandleFormChange("restaurantId", e.target.value)
+                        }
+                      >
+                        <option value="">Select a restaurant...</option>
+                        {RestaurantList.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary m-0"
+                    onClick={CloseModal}
+                    disabled={Saving}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn bg-gradient-dark m-0"
+                    disabled={Saving}
+                  >
+                    {Saving
+                      ? "Saving..."
+                      : ModalMode === "add"
+                        ? "Create User"
+                        : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

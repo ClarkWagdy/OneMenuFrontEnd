@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Order, OrderStatus, StationFilter } from "./types";
+import styles from "./kitchen.module.css";
 
 interface Props {
   orders: Order[];
@@ -35,16 +36,14 @@ function ElapsedTimer({
   const isWarning = elapsed > slaSeconds * 0.75;
   const isAlert = elapsed > slaSeconds;
 
+  const timerClass = isAlert
+    ? styles.timerAlert
+    : isWarning
+      ? styles.timerWarning
+      : styles.timerNormal;
+
   return (
-    <span
-      className={`font-mono text-sm font-bold tabular-nums ${
-        isAlert
-          ? "text-red-400 animate-timer-pulse"
-          : isWarning
-            ? "text-amber-400"
-            : "text-stone-400"
-      }`}
-    >
+    <span className={`${styles.timerText} ${timerClass}`}>
       {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
     </span>
   );
@@ -52,16 +51,16 @@ function ElapsedTimer({
 
 // ── Status helpers ────────────────────────────────────────────────────────────
 
-function statusDot(status: OrderStatus): string {
+function statusDotClass(status: OrderStatus): string {
   const map: Record<OrderStatus, string> = {
-    new: "bg-blue-400",
-    preparing: "bg-amber-400",
-    ready: "bg-emerald-400",
-    delayed: "bg-red-400",
-    served: "bg-violet-400",
-    paid: "bg-stone-500",
+    new: styles.statusDotNew,
+    preparing: styles.statusDotPreparing,
+    ready: styles.statusDotReady,
+    delayed: styles.statusDotDelayed,
+    served: styles.statusDotServed,
+    paid: styles.statusDotPaid,
   };
-  return map[status] ?? "bg-stone-500";
+  return map[status] ?? styles.statusDotPaid;
 }
 
 function nextStatus(current: OrderStatus): OrderStatus | null {
@@ -103,65 +102,64 @@ function OrderTicket({
   onBump: (id: string, status: OrderStatus) => void;
   onDelay: (id: string) => void;
 }) {
+  console.log(order)
   const elapsed = useElapsed(order.createdAt);
   const slaSeconds = 900; // 15 min SLA
   const isDelayed = elapsed > slaSeconds || order.status === "delayed";
   const next = nextStatus(order.status);
 
-  const courseGroups = [
-    { label: "Starters", ids: ["starter"] },
-    { label: "Mains", ids: ["main"] },
-    { label: "Salads", ids: ["salad"] },
-    { label: "Drinks", ids: ["drink"] },
-    { label: "Desserts", ids: ["dessert"] },
-  ];
+  // const courseGroups = [
+  //   { label: "Starters", ids: ["starter"] },
+  //   { label: "Mains", ids: ["main"] },
+  //   { label: "Salads", ids: ["salad"] },
+  //   { label: "Drinks", ids: ["drink"] },
+  //   { label: "Desserts", ids: ["dessert"] },
+  // ];
+
+  const ticketClass = isDelayed
+    ? `${styles.ticket} ${styles.ticketDelayed}`
+    : order.status === "ready"
+      ? `${styles.ticket} ${styles.ticketReady}`
+      : styles.ticket;
+
+  const ticketHeaderClass = isDelayed
+    ? `${styles.ticketHeader} ${styles.ticketHeaderDelayed}`
+    : order.status === "ready"
+      ? `${styles.ticketHeader} ${styles.ticketHeaderReady}`
+      : order.status === "preparing"
+        ? `${styles.ticketHeader} ${styles.ticketHeaderPreparing}`
+        : `${styles.ticketHeader} ${styles.ticketHeaderDefault}`;
+
+  const statusLabelClass = isDelayed
+    ? styles.orderMetaStatusDelayed
+    : order.status === "ready"
+      ? styles.orderMetaStatusReady
+      : order.status === "preparing"
+        ? styles.orderMetaStatusPreparing
+        : styles.orderMetaStatusNew;
+
+  const bumpButtonClass =
+    order.status === "new"
+      ? `${styles.bumpButton} ${styles.bumpButtonNew}`
+      : order.status === "preparing"
+        ? `${styles.bumpButton} ${styles.bumpButtonPreparing}`
+        : `${styles.bumpButton} ${styles.bumpButtonDefault}`;
 
   return (
-    <div
-      className={`flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 animate-slide-up ${
-        isDelayed
-          ? "border-red-500/50 bg-stone-900 animate-pulse-alert"
-          : order.status === "ready"
-            ? "border-emerald-500/30 bg-stone-900"
-            : "border-stone-700 bg-stone-900"
-      }`}
-      style={{ minWidth: 0 }}
-    >
+    <div className={ticketClass} style={{ minWidth: 0 }}>
       {/* Ticket header */}
-      <div
-        className={`px-4 py-3 flex items-center justify-between border-b ${
-          isDelayed
-            ? "border-red-500/30 bg-red-900/20"
-            : order.status === "ready"
-              ? "border-emerald-500/20 bg-emerald-900/10"
-              : order.status === "preparing"
-                ? "border-amber-500/20 bg-amber-900/10"
-                : "border-stone-700/60 bg-stone-800/40"
-        }`}
-      >
-        <div className="flex items-center gap-3">
+      <div className={ticketHeaderClass}>
+        <div className={styles.ticketHeaderLeft}>
           {/* Table number */}
-          <span className="font-mono text-3xl font-bold text-white leading-none">
-            {order.tableNumber}
-          </span>
+          <span className={styles.tableNumber}>{order.tableNumber}</span>
           <div>
-            <p className="font-mono text-xs text-stone-400 leading-none">
-              {order.orderNumber}
-            </p>
-            <div className="flex items-center gap-1.5 mt-0.5">
+            <p className={styles.orderMetaNumber}>{order.orderNumber}</p>
+            <div className={styles.orderMetaStatusRow}>
               <div
-                className={`w-2 h-2 rounded-full ${statusDot(order.status)}`}
+                className={`${styles.statusDot} ${styles.statusDotSmall} ${statusDotClass(order.status)}`}
               />
               <span
-                className={`text-[10px] font-bold uppercase tracking-wider ${
-                  isDelayed
-                    ? "text-red-400"
-                    : order.status === "ready"
-                      ? "text-emerald-400"
-                      : order.status === "preparing"
-                        ? "text-amber-400"
-                        : "text-blue-400"
-                }`}
+                className={`${styles.orderMetaStatusLabel} ${statusLabelClass}`}
               >
                 {isDelayed && order.status !== "delayed"
                   ? "DELAYED"
@@ -170,10 +168,10 @@ function OrderTicket({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className={styles.ticketHeaderRight}>
           <ElapsedTimer createdAt={order.createdAt} slaSeconds={slaSeconds} />
           {isDelayed && (
-            <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center">
+            <div className={styles.alertIconWrap}>
               <svg
                 width="12"
                 height="12"
@@ -192,90 +190,58 @@ function OrderTicket({
       </div>
 
       {/* Items list */}
-      <div className="flex-1 px-4 py-3 space-y-3">
-        {courseGroups.map((group) => {
-          const groupItems = order.items.filter((i) =>
-            group.ids.includes(i.course),
-          );
-          if (groupItems.length === 0) return null;
-          return (
-            <div key={group.label}>
-              <p className="text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1.5">
-                {group.label}
-              </p>
-              <div className="space-y-2">
-                {groupItems.map((item) => (
-                  <div key={item.id}>
-                    <div className="flex items-start gap-2">
-                      <span className="font-mono text-base font-bold text-amber-400 leading-tight w-6 flex-shrink-0">
-                        {item.quantity}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-stone-100 leading-tight">
-                          {item.name}
-                        </p>
-                        {item.variant && (
-                          <p className="text-xs text-stone-400 mt-0.5">
-                            {item.variant}
-                          </p>
-                        )}
-                        {item.modifiers.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {item.modifiers.map((m) => (
-                              <span
-                                key={m}
-                                className="text-[10px] font-medium text-stone-300 bg-stone-800 px-1.5 py-0.5 rounded"
-                              >
-                                {m}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {item.notes && (
-                          <p className="text-[10px] text-amber-300/80 italic mt-0.5 bg-amber-900/20 px-2 py-1 rounded">
-                            {item.notes}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+      {/* Items list */}
+      
+<div className={styles.itemsList}>
+  {order.items.map((item) => (
+    <div key={item.id} className={styles.courseItems}>
+      <div className={styles.itemRow}>
+        <span className={styles.itemQty}>{item.quantity}</span>
+        <div className={styles.itemDetails}>
+          <p className={styles.itemName}>{item.name}</p>
+          {item.variant && (
+            <p className={styles.itemVariant}>{item.variant}</p>
+          )}
+          {item.modifiers.length > 0 && (
+            <div className={styles.modifiersRow}>
+              {item.modifiers.map((m) => (
+                <span key={m} className={styles.modifierChip}>
+                  {m}
+                </span>
+              ))}
             </div>
-          );
-        })}
-
-        {/* Table notes */}
-        {order.notes && (
-          <div className="bg-amber-900/20 border border-amber-500/20 rounded-xl px-3 py-2 mt-2">
-            <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-0.5">
-              Note
-            </p>
-            <p className="text-xs text-amber-200/80">{order.notes}</p>
-          </div>
-        )}
+          )}
+          {item.notes && (
+            <p className={styles.itemNotes}>{item.notes}</p>
+          )}
+        </div>
       </div>
+    </div>
+  ))}
+
+  {/* Table notes */}
+  {order.notes && (
+    <div className={styles.tableNotes}>
+      <p className={styles.tableNotesLabel}>Note</p>
+      <p className={styles.tableNotesText}>{order.notes}</p>
+    </div>
+  )}
+</div>
 
       {/* Bump buttons */}
       {next && (
-        <div className="px-3 pb-3 flex gap-2">
+        <div className={styles.actionsRow}>
           {!isDelayed && (
             <button
               onClick={() => onDelay(order.id)}
-              className="flex-shrink-0 px-3 py-2.5 rounded-xl bg-stone-800 text-stone-400 text-xs font-semibold hover:bg-red-900/40 hover:text-red-400 transition-all active:scale-95"
+              className={styles.delayButton}
             >
               Delay
             </button>
           )}
           <button
             onClick={() => onBump(order.id, next)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${
-              order.status === "new"
-                ? "bg-blue-600 hover:bg-blue-500 text-white"
-                : order.status === "preparing"
-                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
-                  : "bg-stone-600 hover:bg-stone-500 text-white"
-            }`}
+            className={bumpButtonClass}
           >
             {bumpLabel(order.status)}
             <svg
@@ -293,10 +259,10 @@ function OrderTicket({
         </div>
       )}
       {order.status === "ready" && (
-        <div className="px-3 pb-3">
+        <div className={styles.servedRow}>
           <button
             onClick={() => onBump(order.id, "served")}
-            className="w-full py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+            className={styles.servedButton}
           >
             <svg
               width="14"
@@ -326,7 +292,7 @@ function KDSClock() {
     return () => clearInterval(id);
   }, []);
   return (
-    <span className="font-mono text-stone-400 text-sm tabular-nums">
+    <span className={styles.clockText}>
       {time.toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -340,7 +306,6 @@ function KDSClock() {
 
 export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
   const [station, setStation] = useState<StationFilter>("all");
-
   const stations: Array<{ id: StationFilter; label: string }> = [
     { id: "all", label: "All Stations" },
     { id: "grill", label: "Grill" },
@@ -364,32 +329,35 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
   const columns: Array<{
     id: OrderStatus;
     label: string;
-    accent: string;
-    border: string;
-    headerBg: string;
+    titleClass: string;
+    headerBgClass: string;
   }> = [
     {
       id: "new",
       label: "New",
-      accent: "text-blue-400",
-      border: "border-blue-500/30",
-      headerBg: "bg-blue-900/20",
+      titleClass: styles.columnTitleNew,
+      headerBgClass: styles.columnHeaderBgNew,
     },
     {
       id: "preparing",
       label: "Preparing",
-      accent: "text-amber-400",
-      border: "border-amber-500/30",
-      headerBg: "bg-amber-900/20",
+      titleClass: styles.columnTitlePreparing,
+      headerBgClass: styles.columnHeaderBgPreparing,
     },
     {
       id: "ready",
       label: "Ready",
-      accent: "text-emerald-400",
-      border: "border-emerald-500/30",
-      headerBg: "bg-emerald-900/20",
+      titleClass: styles.columnTitleReady,
+      headerBgClass: styles.columnHeaderBgReady,
     },
   ];
+
+  const countClassFor = (status: OrderStatus) =>
+    status === "new"
+      ? styles.countValueNew
+      : status === "preparing"
+        ? styles.countValuePrep
+        : styles.countValueReady;
 
   const delayed = activeOrders.filter((o) => {
     const elapsed = (Date.now() - o.createdAt) / 1000;
@@ -397,33 +365,31 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
   });
 
   return (
-    <div className="flex flex-col h-full bg-stone-950 text-stone-100 font-sans">
+    <div className={styles.container}>
       {/* KDS Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-stone-800 bg-stone-900/80 flex-shrink-0">
-        <div className="flex items-center gap-4">
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center">
+          <div className={styles.logoGroup}>
+            <div className={styles.logoIcon}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
               </svg>
             </div>
-            <span className="text-sm font-bold text-stone-200 tracking-tight">
-              Plat KDS
-            </span>
+            <span className={styles.logoText}>Plat KDS</span>
           </div>
 
           {/* Station filter */}
-          <div className="flex gap-1 bg-stone-800/60 p-1 rounded-xl">
+          <div className={styles.stationFilter}>
             {stations.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setStation(s.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+                className={
                   station === s.id
-                    ? "bg-amber-500 text-stone-900 shadow-sm"
-                    : "text-stone-400 hover:text-stone-200 hover:bg-stone-700/50"
-                }`}
+                    ? `${styles.stationButton} ${styles.stationButtonActive}`
+                    : styles.stationButton
+                }
               >
                 <span>{STATION_ICONS[s.id]}</span>
                 {s.label}
@@ -432,10 +398,10 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className={styles.headerRight}>
           {/* Alerts count */}
           {delayed.length > 0 && (
-            <div className="flex items-center gap-2 bg-red-900/30 border border-red-500/30 px-3 py-1.5 rounded-xl animate-pulse-alert">
+            <div className={styles.alertBadge}>
               <svg
                 width="14"
                 height="14"
@@ -449,28 +415,32 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
                 <line x1="12" y1="9" x2="12" y2="13" />
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
-              <span className="text-xs font-bold text-red-400">
+              <span className={styles.alertBadgeText}>
                 {delayed.length} DELAYED
               </span>
             </div>
           )}
 
           {/* Order count */}
-          <div className="flex items-center gap-4 text-xs text-stone-500">
+          <div className={styles.orderCounts}>
             <span>
-              <span className="font-mono text-blue-400 font-bold text-base">
+              <span className={`${styles.countValue} ${countClassFor("new")}`}>
                 {activeOrders.filter((o) => o.status === "new").length}
               </span>{" "}
               new
             </span>
             <span>
-              <span className="font-mono text-amber-400 font-bold text-base">
+              <span
+                className={`${styles.countValue} ${countClassFor("preparing")}`}
+              >
                 {activeOrders.filter((o) => o.status === "preparing").length}
               </span>{" "}
               prep
             </span>
             <span>
-              <span className="font-mono text-emerald-400 font-bold text-base">
+              <span
+                className={`${styles.countValue} ${countClassFor("ready")}`}
+              >
                 {activeOrders.filter((o) => o.status === "ready").length}
               </span>{" "}
               ready
@@ -482,7 +452,7 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
       </header>
 
       {/* Kanban board */}
-      <div className="flex-1 grid grid-cols-3 gap-0 overflow-hidden min-h-0">
+      <div className={styles.board}>
         {columns.map((col) => {
           const visibleOrders =
             col.id === "new"
@@ -496,33 +466,32 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
                 );
 
           return (
-            <div
-              key={col.id}
-              className={`flex flex-col border-r border-stone-800 last:border-r-0 min-h-0`}
-            >
+            <div key={col.id} className={styles.column}>
               {/* Column header */}
               <div
-                className={`px-4 py-3 border-b border-stone-800 flex-shrink-0 ${col.headerBg}`}
+                className={`${styles.columnHeader} ${col.headerBgClass}`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className={styles.columnHeaderRow}>
+                  <div className={styles.columnHeaderLeft}>
                     <div
-                      className={`w-2.5 h-2.5 rounded-full ${statusDot(col.id)}`}
+                      className={`${styles.statusDot} ${styles.statusDotLarge} ${statusDotClass(col.id)}`}
                     />
-                    <h2 className={`font-bold text-sm ${col.accent}`}>
+                    <h2 className={`${styles.columnTitle} ${col.titleClass}`}>
                       {col.label}
                     </h2>
                   </div>
-                  <span className={`font-mono text-lg font-bold ${col.accent}`}>
+                  <span
+                    className={`${styles.columnCount} ${col.titleClass}`}
+                  >
                     {visibleOrders.length}
                   </span>
                 </div>
               </div>
 
               {/* Tickets */}
-              <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              <div className={styles.ticketsArea}>
                 {visibleOrders.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-stone-700 gap-2">
+                  <div className={styles.emptyState}>
                     <svg
                       width="28"
                       height="28"
@@ -534,7 +503,7 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
                       <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                       <rect x="9" y="3" width="6" height="4" rx="1" />
                     </svg>
-                    <p className="text-xs font-medium">All clear</p>
+                    <p className={styles.emptyText}>All clear</p>
                   </div>
                 ) : (
                   visibleOrders.map((order) => (
