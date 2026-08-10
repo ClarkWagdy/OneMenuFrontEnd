@@ -6,6 +6,7 @@ export type OrderStatus =
   | "ready"
   | "delayed"
   | "served"
+  | "completed"
   | "paid";
 
 // ── Station / Course ─────────────────────────────────────────────────────────

@@ -53,6 +53,7 @@ function notify(message: string, type: 'success' | 'error' = 'success') {
   });
 }
 function getAccentColorRgb(Restaurant: RestaurantT) {
+ 
   return Restaurant
     ? Restaurant.color?.startsWith?.("#")
       ? Restaurant.color
@@ -103,7 +104,6 @@ export default function Page() {
   const cartTotal = Cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
-  const connectionRef = useRef<signalR.HubConnection | null>(null);
   // tableNumber
   function PlaceOrder() {
     axios
@@ -124,7 +124,7 @@ export default function Page() {
           );
           dispatch(ClearCart());
 
-          const newOrderId = res.data.id;
+          const newOrderId = res.data?.data?.id;
           if (newOrderId) {
             setCurrentOrderId(newOrderId);
             const status = res.data?.data?.status ?? "Pending";
@@ -168,11 +168,11 @@ export default function Page() {
       localStorage.removeItem(`activeOrder:${Restaurant.id}`);
       // Optionally clear from state too, after a short delay so the user
       // still sees the final status before the tracker disappears
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setCurrentOrderId(null);
         setOrderStatus(null);
       }, 3000);
-      return;
+      return () => clearTimeout(t);
     }
 
     localStorage.setItem(
@@ -180,9 +180,15 @@ export default function Page() {
       JSON.stringify({ orderId: currentOrderId, status: orderStatus }),
     );
   }, [orderStatus, currentOrderId, Restaurant.id]);
+
+  // --- Live order status over SignalR --------------------------------------
   useEffect(() => {
-    console.log("Current Order ID:", currentOrderId);
     if (!currentOrderId) return;
+
+    // Guards against a stale connection's async callbacks (start/.then, join,
+    // rejoin-on-reconnect) touching state after a newer effect run has already
+    // torn this connection down — e.g. currentOrderId changing in quick succession.
+    let cancelled = false;
 
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${url}/hubs/orders`, {
@@ -194,20 +200,31 @@ export default function Page() {
     connection.on(
       "OrderStatusUpdated",
       (payload: { orderId: string; status: string }) => {
-        if (payload.orderId === currentOrderId) {
+        if (!cancelled && payload.orderId === currentOrderId) {
           setOrderStatus(payload.status);
         }
       },
     );
 
+    // withAutomaticReconnect() re-establishes the socket after a network blip,
+    // but SignalR groups don't survive a reconnect — without this, the client
+    // comes back online but silently stops receiving updates for this order.
+    connection.onreconnected(() => {
+      if (!cancelled) {
+        connection.invoke("JoinOrderGroup", currentOrderId).catch(() => {});
+      }
+    });
+
     connection
       .start()
-      .then(() => connection.invoke("JoinOrderGroup", currentOrderId))
+      .then(() => {
+        if (cancelled) return;
+        return connection.invoke("JoinOrderGroup", currentOrderId);
+      })
       .catch((err: any) => console.log("SignalR connection error:", err));
 
-    connectionRef.current = connection;
-
     return () => {
+      cancelled = true;
       connection.invoke("LeaveOrderGroup", currentOrderId).catch(() => {});
       connection.stop();
     };
@@ -788,6 +805,7 @@ export default function Page() {
         <CartWidget onPlaceOrder={PlaceOrder} />
 
         <ToastContainer />
+      
         {currentOrderId && (
           <OrderStatusTracker
             status={orderStatus}

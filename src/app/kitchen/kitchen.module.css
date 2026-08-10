@@ -263,6 +263,8 @@
 }
 
 .columnTitle {
+  padding: 0px !important;
+  margin: 0px !important;
   font-weight: 700;
   font-size: 0.875rem;
 }

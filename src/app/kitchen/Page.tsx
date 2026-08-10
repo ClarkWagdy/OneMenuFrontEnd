@@ -20,6 +20,7 @@ function mapOrderDtoToOrder(dto: any): Order {
   0: "new",
   1: "preparing",
   2: "ready",
+  3: "completed"
 };
 function normalizeStatus(raw: any): OrderStatus {
   if (typeof raw === "number") return STATUS_MAP[raw] ?? "new";
