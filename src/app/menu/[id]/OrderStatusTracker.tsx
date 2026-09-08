@@ -64,14 +64,13 @@ function parseRgbChannels(colorStr?: string): string {
 export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
   const isAr = strings.getLanguage() === Languages.AR;
   if (!status) return null;
-console.log("Rendering OrderStatusTracker with status:", status, "and accentColorRgb:", accentColorRgb);
-  const normalizedStatus =function normalizeStatus(raw: any): OrderStatus {
+  function normalizeStatus(raw: any): OrderStatus {
   if (typeof raw === "number") return STATUS_MAP[raw] ?? "new";
   if (typeof raw === "string") return raw.toLowerCase() as OrderStatus;
   return "new";
 }
-  
-  status.toLowerCase();
+
+  const normalizedStatus = normalizeStatus(status);
   const rawRgb = parseRgbChannels(accentColorRgb);
   const isCancelled = normalizedStatus === "cancelled" || normalizedStatus === "rejected";
 
