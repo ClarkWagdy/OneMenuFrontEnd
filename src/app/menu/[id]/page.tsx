@@ -33,6 +33,7 @@ import CartWidget from './CartWidget';
 import { rgbToHex } from "@/app/dashboard/subscribers/ClientModal/ClientModal";
 import * as signalR from "@microsoft/signalr";
 import OrderStatusTracker from "./OrderStatusTracker";
+import { HUB_BASE } from "@/app/kitchen/page";
 
 // ---------------------------------------------------------------------------
 // Small shared helpers (kept local to this file so nothing else has to change)
@@ -116,6 +117,7 @@ export default function Page() {
         })),
       })
       .then((res) => {
+        console.log("PlaceOrder response:", res);
         if (res.status === 200) {
           notify(
             strings.getLanguage() === Languages.AR
@@ -124,7 +126,8 @@ export default function Page() {
           );
           dispatch(ClearCart());
 
-          const newOrderId = res.data?.data?.id;
+          const newOrderId = res.data?.id;
+           console.log("newOrderId response:", newOrderId);
           if (newOrderId) {
             setCurrentOrderId(newOrderId);
             const status = res.data?.data?.status ?? "Pending";
@@ -182,53 +185,59 @@ export default function Page() {
   }, [orderStatus, currentOrderId, Restaurant.id]);
 
   // --- Live order status over SignalR --------------------------------------
-  useEffect(() => {
-    if (!currentOrderId) return;
+useEffect(() => {
+  if (!currentOrderId) return;
+ 
+  let cancelled = false;
+  const targetOrderId = currentOrderId.toLowerCase();
 
-    // Guards against a stale connection's async callbacks (start/.then, join,
-    // rejoin-on-reconnect) touching state after a newer effect run has already
-    // torn this connection down — e.g. currentOrderId changing in quick succession.
-    let cancelled = false;
+  // Create connection without authentication token factory
+  const connection = new signalR.HubConnectionBuilder()
+    .withUrl(`${HUB_BASE}/hubs/orders`)
+    .withAutomaticReconnect()
+    .build();
 
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${url}/hubs/orders`, {
-        accessTokenFactory: () => (User.token as string) ?? "",
-      })
-      .withAutomaticReconnect()
-      .build();
+  // Register listener before connection starts
+  connection.on("OrderStatusUpdated", (data: { orderId: string; status: string }) => {
+    console.log("SignalR OrderStatusUpdated event:", data);
+    if (!cancelled && data?.orderId?.toLowerCase() === targetOrderId) {
 
-    connection.on(
-      "OrderStatusUpdated",
-      (payload: { orderId: string; status: string }) => {
-        if (!cancelled && payload.orderId === currentOrderId) {
-          setOrderStatus(payload.status);
-        }
-      },
-    );
+      console.log("Updating order status to:", data.status);
+      setOrderStatus(data.status);
+    }
+  });
 
-    // withAutomaticReconnect() re-establishes the socket after a network blip,
-    // but SignalR groups don't survive a reconnect — without this, the client
-    // comes back online but silently stops receiving updates for this order.
-    connection.onreconnected(() => {
+  // Re-join group automatically after network reconnection
+  connection.onreconnected(() => {
+    if (!cancelled) {
+      connection.invoke("JoinOrderGroup", targetOrderId).catch((err) => {
+        console.error("Failed to re-join order group on reconnect:", err);
+      });
+    }
+  });
+
+  // Single startup pipeline
+  connection
+    .start()
+    .then(() => {
+      if (cancelled) return;
+      return connection.invoke("JoinOrderGroup", targetOrderId);
+    })
+    .catch((err) => {
       if (!cancelled) {
-        connection.invoke("JoinOrderGroup", currentOrderId).catch(() => {});
+        console.error("SignalR connection error:", err);
       }
     });
 
-    connection
-      .start()
-      .then(() => {
-        if (cancelled) return;
-        return connection.invoke("JoinOrderGroup", currentOrderId);
-      })
-      .catch((err: any) => console.log("SignalR connection error:", err));
-
-    return () => {
-      cancelled = true;
-      connection.invoke("LeaveOrderGroup", currentOrderId).catch(() => {});
-      connection.stop();
-    };
-  }, [currentOrderId]);
+  // Cleanup handler
+  return () => {
+    cancelled = true;
+    if (connection.state === signalR.HubConnectionState.Connected) {
+      connection.invoke("LeaveOrderGroup", targetOrderId).catch(() => {});
+    }
+    connection.stop().catch(() => {});
+  };
+}, [currentOrderId]);
   // --- Fetch the restaurant exactly once -----------------------------------
   useEffect(() => {
     const restaurantId = params?.id as string | undefined;
@@ -433,6 +442,9 @@ export default function Page() {
 
   const isStaff =
     User?.type === UserType.Admin || User?.type === UserType.Owner;
+
+
+ 
 
   return (
     <>

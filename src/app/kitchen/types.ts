@@ -7,7 +7,9 @@ export type OrderStatus =
   | "delayed"
   | "served"
   | "completed"
-  | "paid";
+  | "paid"
+  | "cancelled"
+  | "rejected";
 
 // ── Station / Course ─────────────────────────────────────────────────────────
 // These are string-based (not strict unions) since kitchens often add new

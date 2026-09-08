@@ -1,7 +1,7 @@
 "use client";
 import { Languages } from "@/config/localization/Languages";
 import { strings } from "@/config/localization/LocalizedStrings";
-import { useAppSelector } from "@/config/Store/hooks";
+import { useAppDispatch, useAppSelector } from "@/config/Store/hooks";
 import React, { FC, useState } from "react";
 import { Modal } from "react-bootstrap";
 import classes from "../Menu.module.scss";
@@ -10,11 +10,14 @@ import Switch from "react-switch";
 
 import { OffersImagePath, url, VideoPath } from "@/config/Api/url";
 import { useRouter } from "next/navigation";
+import { HandleLogOut } from "@/config/HandleLogOut/HandleLogOut";
 interface Props {
   SettingModal: boolean;
   setSettingModal: Function;
 }
 const SettingsModal: FC<Props> = (props: Props) => {
+    const dispatch = useAppDispatch();
+
   const _Lan = useAppSelector((state) => state.Lan);
   const Restaurant = useAppSelector((state) => state.Restaurant);
   const User = useAppSelector((state) => state.User);
@@ -109,6 +112,10 @@ console.log("Restaurant data in SettingsModal:", Restaurant);
       })
       .catch((err) => {
         console.log(err);
+          setLoad(false);
+       
+          HandleLogOut(dispatch);
+          
         // props.setSettingModal(false)
       });
   }
@@ -247,14 +254,13 @@ console.log("Restaurant data in SettingsModal:", Restaurant);
               </g>
             </svg>
             <h5 className="p-0 m-0 mx-2 fw-bold">
-              {strings.OrderSettings ?? "Order Settings"}
+              { "Order Settings"}
             </h5>
           </div>
 
           <div className="w-100 d-flex justify-content-between align-items-center px-3 mt-2">
             <label htmlFor="allowOrders" className="fw-bold color-gray">
-              {strings.AllowCustomersToOrder ??
-                "Allow customers to place orders"}
+              {"Allow customers to place orders"}
             </label>
             <Switch
               onChange={(e) => setOrderEnabled(e)}

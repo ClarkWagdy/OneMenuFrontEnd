@@ -1,12 +1,15 @@
-"use client";
+'use client';
 
+import React from "react";
 import { strings } from "@/config/localization/LocalizedStrings";
 import { Languages } from "@/config/localization/Languages";
-import { hexToRgb } from "@/app/dashboard/roles/ClientModal/ClientModal";
+import { OrderStatus } from "@/app/kitchen/types";
+import { STATUS_MAP } from "@/app/kitchen/page";
 
 const STEPS = [
   {
-    key: "Pending",
+    key: "new",
+    aliases: ["pending", "received", "new"],
     labelAr: "تم الاستلام",
     labelEn: "Received",
     icon: (
@@ -14,7 +17,8 @@ const STEPS = [
     ),
   },
   {
-    key: "Preparing",
+    key: "preparing",
+    aliases: ["preparing", "in_progress"],
     labelAr: "جاري التحضير",
     labelEn: "Preparing",
     icon: (
@@ -22,7 +26,8 @@ const STEPS = [
     ),
   },
   {
-    key: "Ready",
+    key: "ready",
+    aliases: ["ready", "prepared"],
     labelAr: "جاهز للاستلام",
     labelEn: "Ready",
     icon: (
@@ -30,7 +35,8 @@ const STEPS = [
     ),
   },
   {
-    key: "Delivered",
+    key: "served",
+    aliases: ["served", "delivered", "completed"],
     labelAr: "تم التسليم",
     labelEn: "Delivered",
     icon: <path d="M5 12.5 9.5 17 19 7.5" />,
@@ -39,16 +45,35 @@ const STEPS = [
 
 interface Props {
   status: string | null;
-  accentColorRgb: string; // e.g. "220, 38, 38" — pass in the resolved Restaurant color
+  accentColorRgb?: string;
+}
+
+// Convert Hex or RGB string to RGB values format ("r, g, b")
+function parseRgbChannels(colorStr?: string): string {
+  if (!colorStr) return "63, 63, 63";
+  let str = colorStr.trim();
+  if (str.startsWith("#")) {
+    str = str.replace("#", "");
+    if (str.length === 3) str = str.split("").map((c) => c + c).join("");
+    const num = parseInt(str, 16);
+    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+  }
+  return str.replace(/rgba?\(|\)/g, "");
 }
 
 export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
- console.log("OrderStatusTracker status:", status, "accentColorRgb:", accentColorRgb);
   const isAr = strings.getLanguage() === Languages.AR;
-
   if (!status) return null;
-
-  const isCancelled = status === "Cancelled" || status === "Rejected";
+console.log("Rendering OrderStatusTracker with status:", status, "and accentColorRgb:", accentColorRgb);
+  const normalizedStatus =function normalizeStatus(raw: any): OrderStatus {
+  if (typeof raw === "number") return STATUS_MAP[raw] ?? "new";
+  if (typeof raw === "string") return raw.toLowerCase() as OrderStatus;
+  return "new";
+}
+  
+  status.toLowerCase();
+  const rawRgb = parseRgbChannels(accentColorRgb);
+  const isCancelled = normalizedStatus === "cancelled" || normalizedStatus === "rejected";
 
   if (isCancelled) {
     return (
@@ -69,14 +94,13 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
             </div>
           </div>
         </div>
-        <style>{globalCss}</style>
       </div>
     );
   }
 
   const activeIndex = Math.max(
     0,
-    STEPS.findIndex((s) => s.key === status),
+    STEPS.findIndex((s) => s.aliases.includes(normalizedStatus))
   );
   const isFinal = activeIndex === STEPS.length - 1;
   const progressPercent = (activeIndex / (STEPS.length - 1)) * 100;
@@ -89,9 +113,8 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
           <span
             style={{
               ...styles.liveDot,
-              background: isFinal ? "#16a34a" : `rgb(${hexToRgb(accentColorRgb)})`,
+              background: isFinal ? "#16a34a" : `rgb(${rawRgb})`,
             }}
-            className={isFinal ? undefined : "otr-livedot"}
           />
           <span style={styles.headerEyebrow}>
             {isAr ? "حالة الطلب" : "Order status"}
@@ -100,7 +123,7 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
         <span
           style={{
             ...styles.headerStatus,
-            color: isFinal ? "#16a34a" : `rgb(${hexToRgb(accentColorRgb)})`,
+            color: isFinal ? "#16a34a" : `rgb(${rawRgb})`,
           }}
         >
           {isAr ? currentStep.labelAr : currentStep.labelEn}
@@ -113,7 +136,7 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
           style={{
             ...styles.trackFill,
             width: `${progressPercent}%`,
-            background: `linear-gradient(90deg, rgba(${hexToRgb(accentColorRgb)},0.55), rgb(${hexToRgb(accentColorRgb)}))`,
+            background: `linear-gradient(90deg, rgba(${rawRgb},0.55), rgb(${rawRgb}))`,
           }}
         />
 
@@ -125,26 +148,16 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
           return (
             <div key={step.key} style={styles.stepCol}>
               <div
-                className={isCurrent && !isFinal ? "otr-pulse-wrap" : undefined}
-                style={{...styles.stepCircleOuter,color: isDone || isCurrent ? accentColorRgb : "#a3a3a3"}}
+                style={{
+                  ...styles.stepCircleOuter,
+                  color: isDone || isCurrent ? `rgb(${rawRgb})` : "#a3a3a3",
+                }}
               >
-                {isCurrent && !isFinal && (
-                  <span
-                    className="otr-pulse-ring"
-                    style={{ borderColor: `rgb(${hexToRgb(accentColorRgb)})` }}
-                  />
-                )}
                 <div
                   style={{
                     ...styles.stepCircle,
-                    background:
-                      isDone || isCurrent
-                        ? `rgb(${hexToRgb(accentColorRgb)})`
-                        : "#ffffff",
-                    borderColor:
-                      isDone || isCurrent
-                        ? `rgb(${hexToRgb(accentColorRgb)})`
-                        : "#e2e2e2",
+                    background: isDone || isCurrent ? `rgb(${rawRgb})` : "#ffffff",
+                    borderColor: isDone || isCurrent ? `rgb(${rawRgb})` : "#e2e2e2",
                   }}
                 >
                   <svg
@@ -152,11 +165,10 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
                     height="16"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke={isDone || isCurrent ? accentColorRgb : "#a3a3a3"}
+                    stroke={isDone || isCurrent ? "#ffffff" : "#a3a3a3"}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className={isDone ? "otr-check-draw" : undefined}
                   >
                     {isDone ? <path d="M5 12.5 9.5 17 19 7.5" /> : step.icon}
                   </svg>
@@ -175,40 +187,9 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
           );
         })}
       </div>
-      <style>{globalCss}</style>
     </div>
   );
 }
-
-const globalCss = `
-  @keyframes otr-ring-pulse {
-    0%   { transform: scale(0.9); opacity: 0.55; }
-    75%  { transform: scale(1.55); opacity: 0; }
-    100% { transform: scale(1.55); opacity: 0; }
-  }
-  @keyframes otr-dot-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
-  }
-  @keyframes otr-check-draw {
-    from { stroke-dasharray: 20; stroke-dashoffset: 20; }
-    to   { stroke-dasharray: 20; stroke-dashoffset: 0; }
-  }
-  .otr-livedot { animation: otr-dot-pulse 1.8s ease-in-out infinite; }
-  .otr-pulse-wrap { position: relative; display: inline-flex; }
-  .otr-pulse-ring {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1.5px solid;
-    animation: otr-ring-pulse 1.8s ease-out infinite;
-  }
-  .otr-check-draw { animation: otr-check-draw 0.35s ease-out; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .otr-livedot, .otr-pulse-ring, .otr-check-draw { animation: none !important; }
-  }
-`;
 
 const styles: Record<string, React.CSSProperties> = {
   wrapper: {
@@ -216,16 +197,13 @@ const styles: Record<string, React.CSSProperties> = {
     bottom: 0,
     left: 0,
     right: 0,
-    background: "rgba(255,255,255,0.85)",
-    backdropFilter: "blur(16px) saturate(160%)",
-    WebkitBackdropFilter: "blur(16px) saturate(160%)",
-    borderTop: "1px solid rgba(0,0,0,0.06)",
+    background: "rgba(255,255,255,0.92)",
+    backdropFilter: "blur(12px)",
+    borderTop: "1px solid rgba(0,0,0,0.08)",
     boxShadow: "0 -8px 30px rgba(0,0,0,0.08)",
     borderRadius: "20px 20px 0 0",
     padding: "16px 22px calc(14px + env(safe-area-inset-bottom))",
-    zIndex: 40,
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif",
+    zIndex: 999,
   },
   headerRow: {
     display: "flex",
@@ -234,28 +212,10 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 480,
     margin: "0 auto 14px",
   },
-  headerLeft: {
-    display: "flex",
-    alignItems: "center",
-    gap: 7,
-  },
-  liveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: "50%",
-    display: "inline-block",
-  },
-  headerEyebrow: {
-    fontSize: 11.5,
-    fontWeight: 600,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    color: "#8a8a92",
-  },
-  headerStatus: {
-    fontSize: 13.5,
-    fontWeight: 700,
-  },
+  headerLeft: { display: "flex", alignItems: "center", gap: 7 },
+  liveDot: { width: 8, height: 8, borderRadius: "50%", display: "inline-block" },
+  headerEyebrow: { fontSize: 12, fontWeight: 600, color: "#8a8a92" },
+  headerStatus: { fontSize: 14, fontWeight: 700 },
   trackWrapper: {
     position: "relative",
     display: "flex",
@@ -266,37 +226,23 @@ const styles: Record<string, React.CSSProperties> = {
   trackBase: {
     position: "absolute",
     top: 17,
-    left: "12%",
-    right: "12%",
+    left: "10%",
+    right: "10%",
     height: 3,
     background: "#ececec",
-    borderRadius: 3,
     zIndex: 0,
   },
   trackFill: {
     position: "absolute",
     top: 17,
-    left: "12%",
+    left: "10%",
     height: 3,
-    borderRadius: 3,
     zIndex: 1,
-    transition: "width 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
-    maxWidth: "76%",
+    transition: "width 0.5s ease",
+    maxWidth: "80%",
   },
-  stepCol: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 7,
-    zIndex: 2,
-    flex: 1,
-  },
-  stepCircleOuter: {
-    position: "relative",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  stepCol: { display: "flex", flexDirection: "column", alignItems: "center", gap: 6, zIndex: 2, flex: 1 },
+  stepCircleOuter: { position: "relative", display: "inline-flex" },
   stepCircle: {
     width: 34,
     height: 34,
@@ -305,41 +251,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     border: "1.5px solid",
-    transition: "background 0.35s ease, border-color 0.35s ease",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
   },
-  stepLabel: {
-    fontSize: 10.5,
-    textAlign: "center",
-    letterSpacing: "0.01em",
-    transition: "color 0.35s ease",
-  },
-  cancelledRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    maxWidth: 480,
-    margin: "0 auto",
-  },
-  cancelledIconRing: {
-    width: 34,
-    height: 34,
-    borderRadius: "50%",
-    background: "#fef2f2",
-    border: "1.5px solid #fecaca",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-  },
-  cancelledTitle: {
-    fontSize: 13.5,
-    fontWeight: 700,
-    color: "#18181b",
-  },
-  cancelledSub: {
-    fontSize: 11.5,
-    color: "#8a8a92",
-    marginTop: 1,
-  },
+  stepLabel: { fontSize: 11, textAlign: "center" },
+  cancelledRow: { display: "flex", alignItems: "center", gap: 12, maxWidth: 480, margin: "0 auto" },
+  cancelledIconRing: { width: 34, height: 34, borderRadius: "50%", background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center" },
+  cancelledTitle: { fontSize: 14, fontWeight: 700, color: "#18181b" },
+  cancelledSub: { fontSize: 12, color: "#8a8a92" },
 };

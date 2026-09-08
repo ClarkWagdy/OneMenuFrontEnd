@@ -86,13 +86,7 @@ try {
 } catch (err) {
   console.error(err);
 }
-
-
-
-
-
-
-    }
+}
     useEffect(() => {
       axios
         .get(
@@ -114,9 +108,9 @@ try {
         .catch(function (error) {
           // handle error
           SetLoad(false);
-          if (error.request.status) {
-            HandleLogOut(dispatch);
-          }
+          if (error?.request.status===401) {
+                    HandleLogOut(dispatch);
+                }
         });
     }, [AddClientModal]);
 

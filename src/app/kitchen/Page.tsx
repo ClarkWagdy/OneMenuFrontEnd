@@ -14,14 +14,21 @@ import { strings } from "@/config/localization/LocalizedStrings";
 // ── API mapping ──────────────────────────────────────────────────────────────
 // Adjust these two functions if your OrderDto / OrderItemDto field names or
 // casing differ from what's assumed here.
-
-function mapOrderDtoToOrder(dto: any): Order {
-  const STATUS_MAP: Record<number, OrderStatus> = {
+export  const STATUS_MAP: Record<number, OrderStatus> = {
   0: "new",
   1: "preparing",
   2: "ready",
-  3: "completed"
+  3: "completed",
+  4: "delayed",
+  5: "served",
+  6: "completed",
+  7: "paid",
+  8: "cancelled",
+  9: "rejected"
+
 };
+function mapOrderDtoToOrder(dto: any): Order {
+
 function normalizeStatus(raw: any): OrderStatus {
   if (typeof raw === "number") return STATUS_MAP[raw] ?? "new";
   if (typeof raw === "string") return raw.toLowerCase() as OrderStatus;
@@ -70,7 +77,7 @@ function extractOrderArray(payload: any): any[] {
 // hub URL can't reuse the API base as-is. This strips a trailing "/api/app"
 // or "/api" segment off `url` to get the root. If your `url` constant is
 // already just the host root (no /api/app suffix), set HUB_BASE = url instead.
-const HUB_BASE = url.replace(/\/api\/app\/?$/, "").replace(/\/api\/?$/, "");
+export const HUB_BASE = url.replace(/\/api\/app\/?$/, "").replace(/\/api\/?$/, "");
 
 // ── Hook: fetch + keep orders in sync ───────────────────────────────────────
 
