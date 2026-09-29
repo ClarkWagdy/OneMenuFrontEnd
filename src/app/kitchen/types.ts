@@ -1,4 +1,5 @@
 // ── Status ───────────────────────────────────────────────────────────────────
+import { url } from "@/config/Api/url";
 
 export type OrderStatus =
   | "new"
@@ -63,3 +64,19 @@ export interface Order {
   /** Optional free-text note for the whole table/order */
   notes?: string;
 }
+
+export const STATUS_MAP: Record<number, OrderStatus> = {
+  0: "new",
+  1: "preparing",
+  2: "ready",
+  3: "delayed",
+  4: "served",
+  5: "completed",
+  6: "paid",
+  7: "cancelled",
+  8: "rejected",
+};
+
+export const HUB_BASE = url
+  .replace(/\/api\/app\/?$/, "")
+  .replace(/\/api\/?$/, "");

@@ -214,7 +214,7 @@ export default function ClientModal(props: Props) {
           valuesData.append("userName", values.userName);
           valuesData.append("password", values.password);
           valuesData.append("restaurantName", values.restaurantName);
-          valuesData.append("color", normalizeColorForSubmit(values.color));
+          valuesData.append("restaurantColor", normalizeColorForSubmit(values.color));
           if (image) {
             valuesData.append("restaurantLogo", image);
           } else if (values.restaurantLogo) {

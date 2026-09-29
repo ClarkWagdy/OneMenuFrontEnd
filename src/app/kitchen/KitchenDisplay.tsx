@@ -7,6 +7,17 @@ interface Props {
   onUpdateStatus: (orderId: string, status: OrderStatus) => void;
 }
 
+// Statuses that no longer belong on the kitchen board at all — once an
+// order reaches one of these it should disappear, not linger or fall back
+// into another column.
+const TERMINAL_STATUSES: OrderStatus[] = [
+  "served",
+  "paid",
+  "completed",
+  "cancelled",
+  "rejected",
+];
+
 // ── Timer ────────────────────────────────────────────────────────────────────
 
 function useElapsed(createdAt: number): number {
@@ -59,6 +70,9 @@ function statusDotClass(status: OrderStatus): string {
     delayed: styles.statusDotDelayed,
     served: styles.statusDotServed,
     paid: styles.statusDotPaid,
+    completed: "",
+    cancelled: "",
+    rejected: "",
   };
   return map[status] ?? styles.statusDotPaid;
 }
@@ -102,19 +116,10 @@ function OrderTicket({
   onBump: (id: string, status: OrderStatus) => void;
   onDelay: (id: string) => void;
 }) {
-  console.log(order)
   const elapsed = useElapsed(order.createdAt);
   const slaSeconds = 900; // 15 min SLA
   const isDelayed = elapsed > slaSeconds || order.status === "delayed";
   const next = nextStatus(order.status);
-
-  // const courseGroups = [
-  //   { label: "Starters", ids: ["starter"] },
-  //   { label: "Mains", ids: ["main"] },
-  //   { label: "Salads", ids: ["salad"] },
-  //   { label: "Drinks", ids: ["drink"] },
-  //   { label: "Desserts", ids: ["dessert"] },
-  // ];
 
   const ticketClass = isDelayed
     ? `${styles.ticket} ${styles.ticketDelayed}`
@@ -190,43 +195,39 @@ function OrderTicket({
       </div>
 
       {/* Items list */}
-      {/* Items list */}
-      
-<div className={styles.itemsList}>
-  {order.items.map((item) => (
-    <div key={item.id} className={styles.courseItems}>
-      <div className={styles.itemRow}>
-        <span className={styles.itemQty}>{item.quantity}</span>
-        <div className={styles.itemDetails}>
-          <p className={styles.itemName}>{item.name}</p>
-          {item.variant && (
-            <p className={styles.itemVariant}>{item.variant}</p>
-          )}
-          {item.modifiers.length > 0 && (
-            <div className={styles.modifiersRow}>
-              {item.modifiers.map((m) => (
-                <span key={m} className={styles.modifierChip}>
-                  {m}
-                </span>
-              ))}
+      <div className={styles.itemsList}>
+        {order.items.map((item) => (
+          <div key={item.id} className={styles.courseItems}>
+            <div className={styles.itemRow}>
+              <span className={styles.itemQty}>{item.quantity}</span>
+              <div className={styles.itemDetails}>
+                <p className={styles.itemName}>{item.name}</p>
+                {item.variant && (
+                  <p className={styles.itemVariant}>{item.variant}</p>
+                )}
+                {item.modifiers.length > 0 && (
+                  <div className={styles.modifiersRow}>
+                    {item.modifiers.map((m) => (
+                      <span key={m} className={styles.modifierChip}>
+                        {m}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {item.notes && <p className={styles.itemNotes}>{item.notes}</p>}
+              </div>
             </div>
-          )}
-          {item.notes && (
-            <p className={styles.itemNotes}>{item.notes}</p>
-          )}
-        </div>
-      </div>
-    </div>
-  ))}
+          </div>
+        ))}
 
-  {/* Table notes */}
-  {order.notes && (
-    <div className={styles.tableNotes}>
-      <p className={styles.tableNotesLabel}>Note</p>
-      <p className={styles.tableNotesText}>{order.notes}</p>
-    </div>
-  )}
-</div>
+        {/* Table notes */}
+        {order.notes && (
+          <div className={styles.tableNotes}>
+            <p className={styles.tableNotesLabel}>Note</p>
+            <p className={styles.tableNotesText}>{order.notes}</p>
+          </div>
+        )}
+      </div>
 
       {/* Bump buttons */}
       {next && (
@@ -306,13 +307,13 @@ function KDSClock() {
 
 export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
   const [station, setStation] = useState<StationFilter>("all");
-  const stations: Array<{ id: StationFilter; label: string }> = [
-    { id: "all", label: "All Stations" },
-    { id: "grill", label: "Grill" },
-    { id: "salads", label: "Salads" },
-    { id: "drinks", label: "Bar" },
-    { id: "desserts", label: "Desserts" },
-  ];
+  // const stations: Array<{ id: StationFilter; label: string }> = [
+  //   { id: "all", label: "All Stations" },
+  //   { id: "grill", label: "Grill" },
+  //   { id: "salads", label: "Salads" },
+  //   { id: "drinks", label: "Bar" },
+  //   { id: "desserts", label: "Desserts" },
+  // ];
 
   const filterByStation = useCallback(
     (order: Order): boolean => {
@@ -322,8 +323,10 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
     [station],
   );
 
+  // Anything terminal (served/paid/completed/cancelled/rejected) is dropped
+  // from the board entirely — it should never re-appear in another column.
   const activeOrders = orders.filter(
-    (o) => o.status !== "served" && o.status !== "paid",
+    (o) => !TERMINAL_STATUSES.includes(o.status),
   );
 
   const columns: Array<{
@@ -380,7 +383,7 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
           </div>
 
           {/* Station filter */}
-          <div className={styles.stationFilter}>
+          {/* <div className={styles.stationFilter}>
             {stations.map((s) => (
               <button
                 key={s.id}
@@ -395,7 +398,7 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
                 {s.label}
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         <div className={styles.headerRight}>
@@ -468,9 +471,7 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
           return (
             <div key={col.id} className={styles.column}>
               {/* Column header */}
-              <div
-                className={`${styles.columnHeader} ${col.headerBgClass}`}
-              >
+              <div className={`${styles.columnHeader} ${col.headerBgClass}`}>
                 <div className={styles.columnHeaderRow}>
                   <div className={styles.columnHeaderLeft}>
                     <div
@@ -480,9 +481,7 @@ export default function KitchenDisplay({ orders, onUpdateStatus }: Props) {
                       {col.label}
                     </h2>
                   </div>
-                  <span
-                    className={`${styles.columnCount} ${col.titleClass}`}
-                  >
+                  <span className={`${styles.columnCount} ${col.titleClass}`}>
                     {visibleOrders.length}
                   </span>
                 </div>

@@ -213,8 +213,8 @@ useEffect(() => {
             valuesData.append("password", values.password);
             valuesData.append("restaurantName", values.restaurantName);
             valuesData.append(
-              "color",
-              normalizeColorForSubmit(values.color)
+              "restaurantColor",
+              normalizeColorForSubmit(values.color),
             );
             if (image) {
               valuesData.append("restaurantLogo", image);

@@ -1,12 +1,11 @@
-'use client';
+"use client";
 
 import React from "react";
 import { strings } from "@/config/localization/LocalizedStrings";
 import { Languages } from "@/config/localization/Languages";
-import { OrderStatus } from "@/app/kitchen/types";
-import { STATUS_MAP } from "@/app/kitchen/page";
+import { OrderStatus, STATUS_MAP } from "@/app/kitchen/types";
 
-const STEPS = [
+export const STEPS = [
   {
     key: "new",
     aliases: ["pending", "received", "new"],
@@ -54,32 +53,62 @@ function parseRgbChannels(colorStr?: string): string {
   let str = colorStr.trim();
   if (str.startsWith("#")) {
     str = str.replace("#", "");
-    if (str.length === 3) str = str.split("").map((c) => c + c).join("");
+    if (str.length === 3)
+      str = str
+        .split("")
+        .map((c) => c + c)
+        .join("");
     const num = parseInt(str, 16);
     return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
   }
   return str.replace(/rgba?\(|\)/g, "");
 }
 
-export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
-  const isAr = strings.getLanguage() === Languages.AR;
-  if (!status) return null;
-  function normalizeStatus(raw: any): OrderStatus {
+// Hoisted to module scope (and exported) so any other component — e.g. the
+// menu page's "order ready" notification — can classify a raw status the
+// exact same way this tracker does, instead of re-implementing its own,
+// possibly-narrower check.
+export function normalizeStatus(raw: any): OrderStatus {
   if (typeof raw === "number") return STATUS_MAP[raw] ?? "new";
   if (typeof raw === "string") return raw.toLowerCase() as OrderStatus;
   return "new";
 }
 
+/** True for any raw status (string, numeric enum, whatever the backend
+ * sends) that this tracker would display as the "Ready" step — including
+ * aliases like "prepared", not just the literal "ready". This is the
+ * source of truth other components should use to decide "is this order
+ * ready", so the ready-notification and this progress bar never disagree. */
+export function isOrderReady(raw: any): boolean {
+  if (raw === null || raw === undefined) return false;
+  const normalized = normalizeStatus(raw);
+  const readyStep = STEPS.find((s) => s.key === "ready");
+  return readyStep ? readyStep.aliases.includes(normalized) : false;
+}
+
+export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
+  const isAr = strings.getLanguage() === Languages.AR;
+  if (!status) return null;
+
   const normalizedStatus = normalizeStatus(status);
   const rawRgb = parseRgbChannels(accentColorRgb);
-  const isCancelled = normalizedStatus === "cancelled" || normalizedStatus === "rejected";
+  const isCancelled =
+    normalizedStatus === "cancelled" || normalizedStatus === "rejected";
 
   if (isCancelled) {
     return (
       <div style={styles.wrapper} dir={isAr ? "rtl" : "ltr"}>
         <div style={styles.cancelledRow}>
           <div style={styles.cancelledIconRing}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.4" strokeLinecap="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#dc2626"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            >
               <path d="M12 8v5" />
               <circle cx="12" cy="16.3" r="0.6" fill="#dc2626" stroke="none" />
             </svg>
@@ -99,7 +128,7 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
 
   const activeIndex = Math.max(
     0,
-    STEPS.findIndex((s) => s.aliases.includes(normalizedStatus))
+    STEPS.findIndex((s) => s.aliases.includes(normalizedStatus)),
   );
   const isFinal = activeIndex === STEPS.length - 1;
   const progressPercent = (activeIndex / (STEPS.length - 1)) * 100;
@@ -155,8 +184,10 @@ export default function OrderStatusTracker({ status, accentColorRgb }: Props) {
                 <div
                   style={{
                     ...styles.stepCircle,
-                    background: isDone || isCurrent ? `rgb(${rawRgb})` : "#ffffff",
-                    borderColor: isDone || isCurrent ? `rgb(${rawRgb})` : "#e2e2e2",
+                    background:
+                      isDone || isCurrent ? `rgb(${rawRgb})` : "#ffffff",
+                    borderColor:
+                      isDone || isCurrent ? `rgb(${rawRgb})` : "#e2e2e2",
                   }}
                 >
                   <svg
@@ -212,7 +243,12 @@ const styles: Record<string, React.CSSProperties> = {
     margin: "0 auto 14px",
   },
   headerLeft: { display: "flex", alignItems: "center", gap: 7 },
-  liveDot: { width: 8, height: 8, borderRadius: "50%", display: "inline-block" },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: "50%",
+    display: "inline-block",
+  },
   headerEyebrow: { fontSize: 12, fontWeight: 600, color: "#8a8a92" },
   headerStatus: { fontSize: 14, fontWeight: 700 },
   trackWrapper: {
@@ -240,7 +276,14 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "width 0.5s ease",
     maxWidth: "80%",
   },
-  stepCol: { display: "flex", flexDirection: "column", alignItems: "center", gap: 6, zIndex: 2, flex: 1 },
+  stepCol: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 6,
+    zIndex: 2,
+    flex: 1,
+  },
   stepCircleOuter: { position: "relative", display: "inline-flex" },
   stepCircle: {
     width: 34,
@@ -252,8 +295,22 @@ const styles: Record<string, React.CSSProperties> = {
     border: "1.5px solid",
   },
   stepLabel: { fontSize: 11, textAlign: "center" },
-  cancelledRow: { display: "flex", alignItems: "center", gap: 12, maxWidth: 480, margin: "0 auto" },
-  cancelledIconRing: { width: 34, height: 34, borderRadius: "50%", background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center" },
+  cancelledRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    maxWidth: 480,
+    margin: "0 auto",
+  },
+  cancelledIconRing: {
+    width: 34,
+    height: 34,
+    borderRadius: "50%",
+    background: "#fef2f2",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   cancelledTitle: { fontSize: 14, fontWeight: 700, color: "#18181b" },
   cancelledSub: { fontSize: 12, color: "#8a8a92" },
 };

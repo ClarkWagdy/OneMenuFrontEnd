@@ -1,60 +1,69 @@
-'use client'
+"use client";
 
 import { FC, useState, useEffect, useCallback, useRef } from "react";
-import classes from '../Menu.module.scss';
+import classes from "../Menu.module.scss";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { Languages, LanguagesTitle } from '@/config/localization/Languages';
-import { strings } from '@/config/localization/LocalizedStrings';
-import { useAppDispatch, useAppSelector } from '@/config/Store/hooks';
-import { SetLan } from '@/config/Store/Lan/LanSlice';
-import AddorEditcategoryModal from './AddorEditcategoryModal';
-import ItemCard from './ItemCard';
-import { UserT, UserType } from '@/config/Store/User/UserType';
-import AddorEditItemModal from './AddorEditItemModal';
-import SettingsModal from './SettingsModal';
-import NoItems from '@/Component/NoItems/NoItems';
-import { SetLoad } from '@/config/Store/Load/LoadSlice';
-import { AdvertisingMediaDTO, CategoryDTO, ProductDTO, RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
-import axios from 'axios';
-import { useParams, useRouter } from 'next/navigation'
-import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
-import { OffersImagePath, RestaurantLogoPath, url, VideoPath } from '@/config/Api/url';
-import Swal from 'sweetalert2';
-import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
-import { HandleLogOut } from '@/config/HandleLogOut/HandleLogOut';
-import HeadTag from '@/Component/Head/HeadTag';
+import { Languages, LanguagesTitle } from "@/config/localization/Languages";
+import { strings } from "@/config/localization/LocalizedStrings";
+import { useAppDispatch, useAppSelector } from "@/config/Store/hooks";
+import { SetLan } from "@/config/Store/Lan/LanSlice";
+import AddorEditcategoryModal from "./AddorEditcategoryModal";
+import ItemCard from "./ItemCard";
+import { UserT, UserType } from "@/config/Store/User/UserType";
+import AddorEditItemModal from "./AddorEditItemModal";
+import SettingsModal from "./SettingsModal";
+import NoItems from "@/Component/NoItems/NoItems";
+import { SetLoad } from "@/config/Store/Load/LoadSlice";
+import {
+  AdvertisingMediaDTO,
+  CategoryDTO,
+  ProductDTO,
+  RestaurantT,
+} from "@/config/Store/Restaurant/RestaurantType";
+import axios from "axios";
+import { useParams, useRouter } from "next/navigation";
+import { SetRestaurant } from "@/config/Store/Restaurant/RestaurantSlice";
+import {
+  OffersImagePath,
+  RestaurantLogoPath,
+  url,
+  VideoPath,
+} from "@/config/Api/url";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { HandleLogOut } from "@/config/HandleLogOut/HandleLogOut";
+import HeadTag from "@/Component/Head/HeadTag";
 import { ClearCart } from "@/config/Store/Cart/CartSlice";
-import CartWidget from './CartWidget';
+import CartWidget from "./CartWidget";
 import { rgbToHex } from "@/app/dashboard/subscribers/ClientModal/ClientModal";
 import * as signalR from "@microsoft/signalr";
-import OrderStatusTracker from "./OrderStatusTracker";
-import { HUB_BASE } from "@/app/kitchen/page";
+import OrderStatusTracker, { isOrderReady } from "./OrderStatusTracker";
+import { HUB_BASE } from "@/app/kitchen/types";
 
 // ---------------------------------------------------------------------------
 // Small shared helpers (kept local to this file so nothing else has to change)
 // ---------------------------------------------------------------------------
 
 /** One toast helper instead of the same 9-line options object copy-pasted everywhere */
-function notify(message: string, type: 'success' | 'error' = 'success') {
+function notify(message: string, type: "success" | "error" = "success") {
   const isAr = strings.getLanguage() === Languages.AR;
   toast[type](message, {
-    position: isAr ? 'bottom-left' : 'bottom-right',
+    position: isAr ? "bottom-left" : "bottom-right",
     autoClose: 2000,
     rtl: isAr,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-    theme: 'colored',
+    theme: "colored",
   });
 }
 function getAccentColorRgb(Restaurant: RestaurantT) {
- 
   return Restaurant
     ? Restaurant.color?.startsWith?.("#")
       ? Restaurant.color
@@ -66,7 +75,7 @@ function getAccentColorRgb(Restaurant: RestaurantT) {
 function handleRequestError(err: any) {
   if (err?.response?.status === 401) {
     localStorage.clear();
-    window.location.replace('/login');
+    window.location.replace("/login");
     return true;
   }
   console.log(err);
@@ -74,6 +83,99 @@ function handleRequestError(err: any) {
 }
 
 const authHeaders = (token: string) => ({ headers: { Authorization: token } });
+
+// ---------------------------------------------------------------------------
+// "Order ready" alert: a synthesized chime (no audio file needed) + a
+// native browser notification + a short vibration on devices that support
+// it. All best-effort — each piece fails silently on its own if the
+// browser/OS doesn't support it, so nothing here can break the page.
+// ---------------------------------------------------------------------------
+
+/** Ask for notification permission — must be called from a direct user
+ * gesture (e.g. inside a button's onClick), or Safari/iOS will silently
+ * ignore it. */
+function requestNotificationPermission() {
+  if (typeof window === "undefined" || typeof Notification === "undefined")
+    return;
+  if (Notification.permission === "default") {
+    Notification.requestPermission().catch(() => {});
+  }
+}
+
+/** A bright three-note ascending chime (C5 → E5 → G5), synthesized entirely
+ * with the Web Audio API so there's no sound file to ship or load. */
+function playReadyChime() {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioContextClass: typeof AudioContext =
+      (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const ctx = new AudioContextClass();
+    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+    const noteDuration = 0.22;
+    const noteSpacing = noteDuration * 0.85;
+
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+
+      const startTime = ctx.currentTime + i * noteSpacing;
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + noteDuration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + noteDuration);
+    });
+
+    setTimeout(
+      () => ctx.close().catch(() => {}),
+      notes.length * noteSpacing * 1000 + 400,
+    );
+  } catch (e) {
+    console.error("Failed to play ready chime:", e);
+  }
+}
+
+/** Native OS/browser notification + in-page toast + vibration, so the
+ * customer is alerted whether the tab is focused, backgrounded, or
+ * notifications are blocked. */
+function notifyOrderReady(Restaurant: RestaurantT) {
+  const isAr = strings.getLanguage() === Languages.AR;
+  const title = isAr ? "طلبك جاهز! 🎉" : "Your order is ready! 🎉";
+  const body = isAr ? "تفضل لاستلام طلبك" : "Come grab it while it's hot";
+
+  if (
+    typeof Notification !== "undefined" &&
+    Notification.permission === "granted"
+  ) {
+    try {
+      new Notification(title, {
+        body,
+        icon: Restaurant?.logo
+          ? `${RestaurantLogoPath}/${Restaurant.logo}`
+          : undefined,
+        tag: "order-ready",
+      });
+    } catch (e) {
+      console.error("Notification failed:", e);
+    }
+  }
+
+  // Always show the in-page toast too — permission may be denied/unsupported.
+  notify(title);
+
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    navigator.vibrate([200, 100, 200]);
+  }
+
+  playReadyChime();
+}
 
 export default function Page() {
   const params = useParams();
@@ -105,12 +207,25 @@ export default function Page() {
   const cartTotal = Cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
+  // Tracks the last raw status we already reacted to, so the "ready" alert
+  // only fires once on the actual transition — not on every re-render, and
+  // not again for an order that was already "ready" before this page
+  // loaded. Kept raw (not pre-normalized) so it can be re-classified with
+  // isOrderReady() below, the same classifier OrderStatusTracker uses.
+  const previousOrderStatusRef = useRef<string | number | null>(null);
+
   // tableNumber
-  function PlaceOrder() {
+  function PlaceOrder(note: string) {
+    // Must happen synchronously inside this click handler (a real user
+    // gesture) or some browsers (Safari in particular) will silently ignore
+    // the permission request.
+    requestNotificationPermission();
+
     axios
       .post(`${url}/order`, {
         restaurantId: Restaurant.id,
         tableNumber: "1",
+        notes: note || undefined,
         items: Cart.map((i) => ({
           productId: i.id,
           quantity: i.quantity,
@@ -127,11 +242,12 @@ export default function Page() {
           dispatch(ClearCart());
 
           const newOrderId = res.data?.id;
-           console.log("newOrderId response:", newOrderId);
+          console.log("newOrderId response:", newOrderId);
           if (newOrderId) {
             setCurrentOrderId(newOrderId);
             const status = res.data?.data?.status ?? "Pending";
             setOrderStatus(status);
+            previousOrderStatusRef.current = status ?? null;
 
             // Persist so it survives refresh/navigation
             localStorage.setItem(
@@ -155,6 +271,9 @@ export default function Page() {
       if (orderId) {
         setCurrentOrderId(orderId);
         setOrderStatus(status);
+        // Seed the ref so a restored "ready" order doesn't re-trigger the
+        // sound/notification on every page load.
+        previousOrderStatusRef.current = status ?? null;
       }
     } catch {
       localStorage.removeItem(`activeOrder:${Restaurant.id}`);
@@ -162,12 +281,17 @@ export default function Page() {
   }, [Restaurant.id]);
 
   // --- Keep localStorage in sync as status changes, clear when order is done ---
-  const TERMINAL_STATUSES = ["Delivered", "Completed", "Cancelled", "Rejected"];
+  // Lower-cased so this matches regardless of how the backend cases the
+  // status string ("Served", "SERVED", "served", ...).
+  const TERMINAL_STATUSES = [
+   4,5,6,7,8
+  ];
 
   useEffect(() => {
     if (!currentOrderId || !Restaurant.id) return;
 
-    if (orderStatus && TERMINAL_STATUSES.includes(orderStatus)) {
+ 
+    if (orderStatus && TERMINAL_STATUSES.includes(+orderStatus)) {
       localStorage.removeItem(`activeOrder:${Restaurant.id}`);
       // Optionally clear from state too, after a short delay so the user
       // still sees the final status before the tracker disappears
@@ -184,60 +308,78 @@ export default function Page() {
     );
   }, [orderStatus, currentOrderId, Restaurant.id]);
 
+  // --- Alert the customer the moment their order becomes "ready" -----------
+  // Uses the same classifier OrderStatusTracker uses (isOrderReady), so any
+  // status the tracker would show as "Ready" — including aliases like
+  // "prepared", not just the literal "ready" — triggers the alert too.
+  useEffect(() => {
+    const isReady = isOrderReady(orderStatus);
+    const wasReady = isOrderReady(previousOrderStatusRef.current);
+
+    if (isReady && !wasReady) {
+      notifyOrderReady(Restaurant);
+    }
+
+    previousOrderStatusRef.current = orderStatus;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderStatus]);
+
   // --- Live order status over SignalR --------------------------------------
-useEffect(() => {
-  if (!currentOrderId) return;
- 
-  let cancelled = false;
-  const targetOrderId = currentOrderId.toLowerCase();
+  useEffect(() => {
+    if (!currentOrderId) return;
 
-  // Create connection without authentication token factory
-  const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`${HUB_BASE}/hubs/orders`)
-    .withAutomaticReconnect()
-    .build();
+    let cancelled = false;
+    const targetOrderId = currentOrderId.toLowerCase();
 
-  // Register listener before connection starts
-  connection.on("OrderStatusUpdated", (data: { orderId: string; status: string }) => {
-    console.log("SignalR OrderStatusUpdated event:", data);
-    if (!cancelled && data?.orderId?.toLowerCase() === targetOrderId) {
+    // Create connection without authentication token factory
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`${HUB_BASE}/hubs/orders`)
+      .withAutomaticReconnect()
+      .build();
 
-      console.log("Updating order status to:", data.status);
-      setOrderStatus(data.status);
-    }
-  });
+    // Register listener before connection starts
+    connection.on(
+      "OrderStatusUpdated",
+      (data: { orderId: string; status: string }) => {
+        console.log("SignalR OrderStatusUpdated event:", data);
+        if (!cancelled && data?.orderId?.toLowerCase() === targetOrderId) {
+          console.log("Updating order status to:", data.status);
+          setOrderStatus(data.status);
+        }
+      },
+    );
 
-  // Re-join group automatically after network reconnection
-  connection.onreconnected(() => {
-    if (!cancelled) {
-      connection.invoke("JoinOrderGroup", targetOrderId).catch((err) => {
-        console.error("Failed to re-join order group on reconnect:", err);
-      });
-    }
-  });
-
-  // Single startup pipeline
-  connection
-    .start()
-    .then(() => {
-      if (cancelled) return;
-      return connection.invoke("JoinOrderGroup", targetOrderId);
-    })
-    .catch((err) => {
+    // Re-join group automatically after network reconnection
+    connection.onreconnected(() => {
       if (!cancelled) {
-        console.error("SignalR connection error:", err);
+        connection.invoke("JoinOrderGroup", targetOrderId).catch((err) => {
+          console.error("Failed to re-join order group on reconnect:", err);
+        });
       }
     });
 
-  // Cleanup handler
-  return () => {
-    cancelled = true;
-    if (connection.state === signalR.HubConnectionState.Connected) {
-      connection.invoke("LeaveOrderGroup", targetOrderId).catch(() => {});
-    }
-    connection.stop().catch(() => {});
-  };
-}, [currentOrderId]);
+    // Single startup pipeline
+    connection
+      .start()
+      .then(() => {
+        if (cancelled) return;
+        return connection.invoke("JoinOrderGroup", targetOrderId);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error("SignalR connection error:", err);
+        }
+      });
+
+    // Cleanup handler
+    return () => {
+      cancelled = true;
+      if (connection.state === signalR.HubConnectionState.Connected) {
+        connection.invoke("LeaveOrderGroup", targetOrderId).catch(() => {});
+      }
+      connection.stop().catch(() => {});
+    };
+  }, [currentOrderId]);
   // --- Fetch the restaurant exactly once -----------------------------------
   useEffect(() => {
     const restaurantId = params?.id as string | undefined;
@@ -442,9 +584,6 @@ useEffect(() => {
 
   const isStaff =
     User?.type === UserType.Admin || User?.type === UserType.Owner;
-
-
- 
 
   return (
     <>
@@ -817,7 +956,7 @@ useEffect(() => {
         <CartWidget onPlaceOrder={PlaceOrder} />
 
         <ToastContainer />
-      
+
         {currentOrderId && (
           <OrderStatusTracker
             status={orderStatus}
