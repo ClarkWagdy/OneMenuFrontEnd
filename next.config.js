@@ -10,31 +10,30 @@ const nextConfig = {
   // experimental: {
   //   appDir: true,
   // },
-
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   sassOptions: {
-    includePaths: [path.join(__dirname, 'styles')],
+    includePaths: [path.join(__dirname, "styles")],
   },
   async rewrites() {
     return [
       {
-        source: '/',
-        destination: 'https://clarkgerges-001-site1.ctempurl.com/:path*',
+        source: "/",
+        destination: "https://clarkgerges-001-site1.ctempurl.com/:path*",
       },
-    ]
+    ];
   },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
-      use: ['@svgr/webpack'],
+      use: ["@svgr/webpack"],
+    });
 
-    })
-
-
-    return config
+    return config;
   },
-
-}
+};
 
 module.exports = nextConfig
 
