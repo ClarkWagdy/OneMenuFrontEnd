@@ -16,8 +16,10 @@ import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { SetLan } from '@/config/Store/Lan/LanSlice';
 import { UserEnum } from '@/config/UserEnum/UserEnum';
-const cairo = Cairo({ subsets: ['arabic', 'latin', 'latin-ext'] });
-
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  display: "swap",
+});
 
 
 export default function Layout({ children }: RootLayoutProps) {
