@@ -87,12 +87,18 @@ export const ar = {
 
   EnterplaceName: "أدخل اسم المكان",
   EnterClientName: "أدخل اسم العميل",
-roles: "الأدوار",
+  roles: "الأدوار",
   PhoneNumber: "رقم الهاتف",
   EnterPhoneNumber: "أدخل رقم الهاتف",
   EmailAddress: "البريد الإلكتروني",
   EnterEmailAddress: "أدخل البريد الإلكتروني",
-  Anerroroccurred:"حدث خطأ",
+  Anerroroccurred: "حدث خطأ",
   PasswordLeaveBlankToKeep: "اتركه فارغًا للاحتفاظ بكلمة المرور الحالية",
-
+  AddSize: "إضافة حجم",
+  SizeName: "اسم الحجم",
+  SizePrice: "سعر الحجم",
+  EnterSizeName: "أدخل اسم الحجم",
+  EnterSizePrice: "أدخل سعر الحجم",
+  Sizes: "الأحجام",
+  Optional: "اختياري",
 };

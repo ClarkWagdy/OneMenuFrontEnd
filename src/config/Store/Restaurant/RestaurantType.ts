@@ -1,3 +1,5 @@
+import { ProductSizeDTO } from "@/app/menu/[id]/typs";
+
  
  export interface AdvertisingMediaDTO{
      id: string,
@@ -13,19 +15,16 @@
       isActive:boolean,
  }
  
- export interface  ProductDTO
- {
-      id :string,
-     nameAr :string,
-     nameEn :string,
-      descAR :string,
-      descEN :string,
-      order :number,
-     image :string,
-     price :string,
-
-
-
+ export interface ProductDTO {
+   id: string;
+   nameAr: string;
+   nameEn: string;
+   descAR: string;
+   descEN: string;
+   order: number;
+   image: string;
+   price: string;
+   sizes:ProductSizeDTO[];
  }
 export interface RestaurantT{
     id :string,
