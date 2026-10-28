@@ -3,8 +3,9 @@ import { Languages } from '@/config/localization/Languages'
 import { strings } from '@/config/localization/LocalizedStrings'
 import React, { useEffect } from 'react'
 import { RootLayoutProps } from './layout'
-import { Cairo } from 'next/font/google'
-import { useAppDispatch, useAppSelector } from '@/config/Store/hooks'
+import localFont from "next/font/local";
+
+ import { useAppDispatch, useAppSelector } from '@/config/Store/hooks'
 import Loading from '@/Component/Loading/Loading'
 import { SetLoad } from '@/config/Store/Load/LoadSlice'
 import { SetUser } from '@/config/Store/User/UserSlice'
@@ -16,9 +17,10 @@ import { RestaurantT } from '@/config/Store/Restaurant/RestaurantType';
 import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { SetLan } from '@/config/Store/Lan/LanSlice';
 import { UserEnum } from '@/config/UserEnum/UserEnum';
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
+const cairo = localFont({
+  src: "./fonts/Cairo-VariableFont.ttf",
   display: "swap",
+  weight: "200 1000",
 });
 
 
