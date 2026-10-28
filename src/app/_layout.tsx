@@ -18,7 +18,7 @@ import { SetRestaurant } from '@/config/Store/Restaurant/RestaurantSlice';
 import { SetLan } from '@/config/Store/Lan/LanSlice';
 import { UserEnum } from '@/config/UserEnum/UserEnum';
 const cairo = localFont({
-  src: "./fonts/Cairo-VariableFont.ttf",
+  src: "./fonts/Cairo-VariableFont_slnt,wght.ttf",
   display: "swap",
   weight: "200 1000",
 });
